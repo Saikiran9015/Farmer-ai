@@ -80,7 +80,9 @@ def serve_statics(filename):
 
 @app.route("/")
 def index():
-    return redirect("/login")
+    db_local = ensure_db_connection()
+    products = list(db_local.products.find().sort("created_at", -1))  # Latest products first
+    return render_template("index.html", products=products)
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -159,22 +161,28 @@ def add_listing_page():
 @app.route("/add_product", methods=["POST"])
 def add_product():
     if "user" not in session: return redirect("/login")
-    if "user" not in session: return redirect("/login")
-    if session.get("user_type") not in ["farmer", "business"]:
+    if session.get("user_type") not in ["farmer", "business", "admin"]:
         flash("Only farmers and businesses can list products!", "error")
         return redirect("/dashboard")
+    
     name = request.form.get("name")
     price = request.form.get("price")
     category = request.form.get("category")
     desc = request.form.get("description")
     
+    # Handle image upload
     file = request.files.get("image")
     image_url = ""
-    if file:
+    if file and file.filename:
         fname = secure_filename(file.filename)
-        path = os.path.join(os.path.dirname(__file__), 'statics', 'image', fname)
+        # Ensure image directory exists
+        image_dir = os.path.join(os.path.dirname(__file__), 'statics', 'image')
+        os.makedirs(image_dir, exist_ok=True)
+        
+        path = os.path.join(image_dir, fname)
         file.save(path)
         image_url = f"/statics/image/{fname}"
+        print(f"Image saved to: {path}")
 
     quality = analyze_quality(name, desc, category, price)
     adj_price = compute_adjusted_price(price, quality)

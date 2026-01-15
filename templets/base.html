@@ -16,11 +16,15 @@
 
 <body>
     <nav class="navbar">
-        <a href="/" class="logo-text">
-            <img src="{{ url_for('serve_statics', filename='krop.png') }}" alt="KropKart" style="height: 40px;">
+        <a href="/" class="logo-text" style="display: flex; align-items: center; gap: 0.5rem;">
+            <img src="{{ url_for('serve_statics', filename='krop.png') }}" alt="KropKart" style="height: 45px;">
+            <span style="font-size: 1.5rem; font-weight: 800; color: var(--primary);">KropKart</span>
         </a>
-        <div class="nav-links" style="display: flex; gap: 1rem; align-items: center;">
+        <div class="nav-links" style="display: flex; gap: 1.5rem; align-items: center;">
             {% if session.get('user') %}
+            <a href="/" style="color: var(--dark); text-decoration: none; font-weight: 500;">
+                <i class="fas fa-home"></i> Home
+            </a>
             <span class="show-md" style="font-weight: 600; color: var(--primary);">
                 Hi, {{ session.get('name').split()[0] }} <span class="badge badge-ai" style="font-size: 0.7rem;">{{
                     session.get('user_type')|upper }}</span>
@@ -28,6 +32,9 @@
             <a href="/dashboard" class="btn btn-primary" style="padding: 0.5rem 1rem;">Dashboard</a>
             <a href="/logout" class="btn btn-secondary" style="padding: 0.5rem 1rem;">Logout</a>
             {% else %}
+            <a href="/" style="color: var(--dark); text-decoration: none; font-weight: 500;">
+                <i class="fas fa-home"></i> Home
+            </a>
             <a href="/login" class="btn btn-primary">Login</a>
             <a href="/register" class="btn btn-secondary">Join Now</a>
             {% endif %}

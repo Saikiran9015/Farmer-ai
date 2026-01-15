@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}KropKart - AI Powered Agricultural Marketplace{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-gradient"
+    style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); min-height: 60vh; display: flex; align-items: center; justify-content: center; text-align: center; color: white; margin-bottom: 3rem;">
+    <div style="max-width: 800px; padding: 2rem;">
+        <img src="{{ url_for('serve_statics', filename='krop.png') }}" alt="KropKart"
+            style="height: 80px; margin-bottom: 1.5rem;">
+        <h1 style="font-size: 3rem; margin-bottom: 1rem; font-weight: 800;">Welcome to KropKart</h1>
+        <p style="font-size: 1.3rem; margin-bottom: 2rem; opacity: 0.95;">India's First AI-Powered Agricultural
+            Marketplace</p>
+        <p style="font-size: 1.1rem; margin-bottom: 2rem; line-height: 1.6;">Connecting farmers directly to buyers with
+            smart quality scoring, fair pricing, and secure payments.</p>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            {% if not session.get('user') %}
+            <a href="/register" class="btn"
+                style="background: white; color: var(--primary); padding: 1rem 2rem; font-size: 1.1rem; font-weight: 600;">
+                <i class="fas fa-user-plus"></i> Join Now
+            </a>
+            <a href="/login" class="btn btn-secondary"
+                style="padding: 1rem 2rem; font-size: 1.1rem; border: 2px solid white;">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </a>
+            {% else %}
+            <a href="/dashboard" class="btn"
+                style="background: white; color: var(--primary); padding: 1rem 2rem; font-size: 1.1rem; font-weight: 600;">
+                <i class="fas fa-tachometer-alt"></i> Go to Dashboard
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div style="margin-bottom: 4rem;">
+    <h2 style="text-align: center; margin-bottom: 3rem; font-size: 2.5rem;">Why Choose KropKart?</h2>
+    <div class="grid-cols-auto" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
+        <div class="card" style="text-align: center; padding: 2rem;">
+            <i class="fas fa-robot fa-3x text-primary mb-3"></i>
+            <h3 style="margin-bottom: 1rem;">AI Quality Scoring</h3>
+            <p class="text-muted">Advanced AI analyzes product quality and adjusts pricing automatically for fair deals.
+            </p>
+        </div>
+        <div class="card" style="text-align: center; padding: 2rem;">
+            <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
+            <h3 style="margin-bottom: 1rem;">Secure Payments</h3>
+            <p class="text-muted">Razorpay-powered checkout ensures your transactions are safe and instant.</p>
+        </div>
+        <div class="card" style="text-align: center; padding: 2rem;">
+            <i class="fas fa-handshake fa-3x text-primary mb-3"></i>
+            <h3 style="margin-bottom: 1rem;">Direct Connection</h3>
+            <p class="text-muted">No middlemen - farmers sell directly to businesses and citizens.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Products Section -->
+<div style="margin-bottom: 4rem;">
+    <div class="flex-between mb-4">
+        <h2><i class="fas fa-shopping-basket text-primary"></i> Fresh Products Available</h2>
+        {% if session.get('user') %}
+        <a href="/dashboard" class="btn btn-primary">View All Products</a>
+        {% endif %}
+    </div>
+
+    {% if products %}
+    <div class="grid-cols-auto">
+        {% for product in products[:6] %}
+        <div class="card">
+            <div
+                style="height: 220px; border-radius: 12px; overflow: hidden; margin-bottom: 1rem; position: relative; background: var(--gray-100);">
+                {% if product.image %}
+                <img src="{{ product.image }}" class="img-cover" alt="{{ product.name }}">
+                {% else %}
+                <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
+                    <i class="fas fa-box fa-3x" style="color: var(--gray-300);"></i>
+                </div>
+                {% endif %}
+                <span class="badge badge-ai" style="position: absolute; top: 0.5rem; right: 0.5rem;">
+                    <i class="fas fa-star"></i> {{ product.quality_score }}
+                </span>
+            </div>
+
+            <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">{{ product.name }}</h3>
+            <span class="badge" style="background: var(--light); color: var(--primary); margin-bottom: 0.5rem;">
+                {{ product.category }}
+            </span>
+
+            <p class="text-muted"
+                style="font-size: 0.9rem; line-height: 1.5; height: 3em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                {{ product.description }}
+            </p>
+
+            <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--gray-100);"
+                class="flex-between">
+                <span style="font-size: 1.4rem; font-weight: 800; color: var(--primary);">₹{{ product.adjusted_price
+                    }}</span>
+                {% if session.get('user') %}
+                <a href="/checkout/{{ product._id }}" class="btn btn-primary">
+                    Buy Now <i class="fas fa-arrow-right"></i>
+                </a>
+                {% else %}
+                <a href="/login" class="btn btn-primary">
+                    Login to Buy
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if products|length > 6 %}
+    <div style="text-align: center; margin-top: 2rem;">
+        <a href="/login" class="btn btn-primary">
+            View All {{ products|length }} Products <i class="fas fa-arrow-right"></i>
+        </a>
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="card" style="text-align: center; padding: 3rem;">
+        <i class="fas fa-box-open fa-4x text-muted mb-4"></i>
+        <h3 class="text-muted">No products available yet</h3>
+        <p class="text-muted">Be the first to list your products!</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
