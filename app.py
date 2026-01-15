@@ -206,24 +206,54 @@ def checkout(product_id):
 # PAYMENT INTEGRATION
 @app.route("/create_order", methods=["POST"])
 def create_order():
-    amount = int(float(request.json['amount']) * 100)
-    order = razorpay_client.order.create({"amount": amount, "currency": "INR", "payment_capture": "1"})
-    return jsonify(order)
+    try:
+        data = request.get_json()
+        if not data or 'amount' not in data:
+            return jsonify({"error": "Amount is required"}), 400
+        
+        amount = int(float(data['amount']) * 100)  # Convert to paise
+        
+        # Create Razorpay order
+        order = razorpay_client.order.create({
+            "amount": amount, 
+            "currency": "INR", 
+            "payment_capture": "1"
+        })
+        
+        print(f"Order created successfully: {order['id']}")
+        return jsonify(order)
+    except Exception as e:
+        print(f"Error creating order: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/verify_payment", methods=["POST"])
 def verify_payment():
-    data = request.json
     try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"status": "failed", "message": "No data received"}), 400
+        
+        # Verify payment signature
         razorpay_client.utility.verify_payment_signature(data)
+        
         # Record order in DB
         ensure_db_connection().orders.insert_one({
-            "user": session.get("user"), "product_id": data['product_id'],
-            "amount": data['amount'], "status": "paid", "date": datetime.now()
+            "user": session.get("user"), 
+            "product_id": data.get('product_id'),
+            "amount": data.get('amount'), 
+            "status": "paid", 
+            "razorpay_payment_id": data.get('razorpay_payment_id'),
+            "date": datetime.now()
         })
+        
+        print(f"Payment verified: {data.get('razorpay_payment_id')}")
         return jsonify({"status": "success"})
+    except razorpay.errors.SignatureVerificationError as e:
+        print(f"Signature verification failed: {str(e)}")
+        return jsonify({"status": "failed", "message": "Invalid signature"}), 400
     except Exception as e:
-        print(e)
-        return jsonify({"status": "failed"}), 400
+        print(f"Payment verification error: {str(e)}")
+        return jsonify({"status": "failed", "message": str(e)}), 500
 
 # Webhook Setup
 RAZORPAY_WEBHOOK_SECRET = os.getenv("RAZORPAY_WEBHOOK_SECRET", "Saikiran9493@#")
