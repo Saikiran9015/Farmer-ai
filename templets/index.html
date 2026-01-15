@@ -1,109 +1,110 @@
 {% extends "base.html" %}
 
-{% block title %}KropKart - AI Powered Agricultural Marketplace{% endblock %}
+{% block title %}Explore Marketplace | Agricultural Hub{% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<div class="hero-gradient"
-    style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); min-height: 60vh; display: flex; align-items: center; justify-content: center; text-align: center; color: white; margin-bottom: 3rem;">
-    <div style="max-width: 800px; padding: 2rem;">
-        <img src="{{ url_for('serve_statics', filename='krop.png') }}" alt="KropKart"
-            style="height: 80px; margin-bottom: 1.5rem;">
-        <h1 style="font-size: 3rem; margin-bottom: 1rem; font-weight: 800;">Welcome to KropKart</h1>
-        <p style="font-size: 1.3rem; margin-bottom: 2rem; opacity: 0.95;">India's First AI-Powered Agricultural
-            Marketplace</p>
-        <p style="font-size: 1.1rem; margin-bottom: 2rem; line-height: 1.6;">Connecting farmers directly to buyers with
-            smart quality scoring, fair pricing, and secure payments.</p>
-        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-            {% if not session.get('user') %}
-            <a href="/register" class="btn"
-                style="background: white; color: var(--primary); padding: 1rem 2rem; font-size: 1.1rem; font-weight: 600;">
-                <i class="fas fa-user-plus"></i> Join Now
-            </a>
-            <a href="/login" class="btn btn-secondary"
-                style="padding: 1rem 2rem; font-size: 1.1rem; border: 2px solid white;">
-                <i class="fas fa-sign-in-alt"></i> Login
-            </a>
-            {% else %}
-            <a href="/dashboard" class="btn"
-                style="background: white; color: var(--primary); padding: 1rem 2rem; font-size: 1.1rem; font-weight: 600;">
-                <i class="fas fa-tachometer-alt"></i> Go to Dashboard
-            </a>
-            {% endif %}
-        </div>
-    </div>
-</div>
-
-<!-- Features Section -->
-<div style="margin-bottom: 4rem;">
-    <h2 style="text-align: center; margin-bottom: 3rem; font-size: 2.5rem;">Why Choose KropKart?</h2>
-    <div class="grid-cols-auto" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
-        <div class="card" style="text-align: center; padding: 2rem;">
-            <i class="fas fa-robot fa-3x text-primary mb-3"></i>
-            <h3 style="margin-bottom: 1rem;">AI Quality Scoring</h3>
-            <p class="text-muted">Advanced AI analyzes product quality and adjusts pricing automatically for fair deals.
-            </p>
-        </div>
-        <div class="card" style="text-align: center; padding: 2rem;">
-            <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
-            <h3 style="margin-bottom: 1rem;">Secure Payments</h3>
-            <p class="text-muted">Razorpay-powered checkout ensures your transactions are safe and instant.</p>
-        </div>
-        <div class="card" style="text-align: center; padding: 2rem;">
-            <i class="fas fa-handshake fa-3x text-primary mb-3"></i>
-            <h3 style="margin-bottom: 1rem;">Direct Connection</h3>
-            <p class="text-muted">No middlemen - farmers sell directly to businesses and citizens.</p>
-        </div>
-    </div>
-</div>
-
-<!-- Products Section -->
-<div style="margin-bottom: 4rem;">
-    <div class="flex-between mb-4">
-        <h2><i class="fas fa-shopping-basket text-primary"></i> Fresh Products Available</h2>
-        {% if session.get('user') %}
-        <a href="/dashboard" class="btn btn-primary">View All Products</a>
-        {% endif %}
+<div class="animate-fade">
+    <!-- Header Section -->
+    <div style="margin-bottom: 3rem; border-bottom: 1px solid var(--gray-200); padding-bottom: 2rem;">
+        <h1
+            style="font-size: 2.8rem; font-weight: 800; color: #0f172a; margin-bottom: 0.5rem; letter-spacing: -0.025em;">
+            Global Agricultural Marketplace</h1>
+        <p class="text-muted" style="font-size: 1.15rem; color: #64748b;">Discover fresh produce and industrial farming
+            equipment verified by our quality standards.</p>
     </div>
 
+    <!-- Filters & Search Bar -->
+    <div style="display: flex; gap: 1rem; margin-bottom: 3rem; flex-wrap: wrap; align-items: center;">
+        <div style="flex: 1; min-width: 300px; position: relative;">
+            <i class="fas fa-search"
+                style="position: absolute; left: 1.25rem; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
+            <input type="text" class="form-control"
+                style="padding: 0.875rem 1.25rem 0.875rem 3.5rem; border-radius: 0.75rem; border: 1px solid #e2e8f0; background: #f8fafc; width: 100%; font-size: 1rem;"
+                placeholder="Search for wheat, rice, tractors...">
+        </div>
+        <div style="position: relative;">
+            <select class="form-control"
+                style="padding: 0.875rem 2.5rem 0.875rem 1.25rem; border-radius: 0.75rem; border: 1px solid #e2e8f0; background: #ffffff; min-width: 180px; appearance: none; cursor: pointer; font-size: 1rem; font-weight: 500;">
+                <option>All Categories</option>
+                <option>Cereals</option>
+                <option>Fruits</option>
+                <option>Vegetables</option>
+                <option>Machinery</option>
+            </select>
+            <i class="fas fa-chevron-down"
+                style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); color: #64748b; pointer-events: none; font-size: 0.8rem;"></i>
+        </div>
+        <button class="btn"
+            style="background: #166534; color: white; padding: 0.875rem 2rem; border-radius: 0.75rem; font-weight: 700; font-size: 1rem; border: none; cursor: pointer; transition: all 0.2s;">
+            Filter Results
+        </button>
+    </div>
+
+    <!-- Listings Grid -->
     {% if products %}
-    <div class="grid-cols-auto">
-        {% for product in products[:6] %}
-        <div class="card">
+    <div class="grid-cols-auto"
+        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2.5rem;">
+        {% for product in products %}
+        <div class="card"
+            style="background: white; border-radius: 1.5rem; padding: 1.25rem; border: 1px solid #f1f5f9; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04); transition: transform 0.3s ease;">
             <div
-                style="height: 220px; border-radius: 12px; overflow: hidden; margin-bottom: 1rem; position: relative; background: var(--gray-100);">
+                style="height: 260px; border-radius: 1.2rem; overflow: hidden; margin-bottom: 1.5rem; position: relative; background: #f1f5f9;">
                 {% if product.image %}
-                <img src="{{ product.image }}" class="img-cover" alt="{{ product.name }}">
+                <img src="{{ product.image }}"
+                    style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;"
+                    alt="{{ product.name }}" onmouseover="this.style.transform='scale(1.1)'"
+                    onmouseout="this.style.transform='scale(1)'">
                 {% else %}
                 <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
-                    <i class="fas fa-box fa-3x" style="color: var(--gray-300);"></i>
+                    <i class="fas fa-seedling fa-4x" style="color: #cbd5e1;"></i>
                 </div>
                 {% endif %}
-                <span class="badge badge-ai" style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                    <i class="fas fa-star"></i> {{ product.quality_score }}
-                </span>
+
+                <!-- Premium Rating Badge -->
+                <div
+                    style="position: absolute; top: 1rem; right: 1rem; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); padding: 0.6rem 0.9rem; border-radius: 0.875rem; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem; color: #ffffff; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 10;">
+                    <i class="fas fa-check-circle" style="color: #22c55e;"></i> Verified: {{ product.rating }}
+                </div>
+
+                {% if session.get('user_type') == 'admin' or product.owner == session.get('user') %}
+                <div style="position: absolute; top: 1rem; left: 1rem; z-index: 10;">
+                    <a href="/delete_product/{{ product._id }}" class="btn"
+                        onclick="return confirm('Arre you sure you want to delete this product?')"
+                        style="background: rgba(220, 38, 38, 0.9); color: white; padding: 0.45rem 0.9rem; font-size: 0.75rem; border-radius: 0.75rem; font-weight: 700; border: none; cursor: pointer; backdrop-filter: blur(8px);">
+                        <i class="fas fa-trash-alt"></i> Delete
+                    </a>
+                </div>
+                {% endif %}
             </div>
 
-            <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">{{ product.name }}</h3>
-            <span class="badge" style="background: var(--light); color: var(--primary); margin-bottom: 0.5rem;">
+            <h3 style="font-size: 1.4rem; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">{{ product.name }}
+            </h3>
+            <span
+                style="display: inline-block; padding: 0.35rem 0.85rem; background: #f0fdf4; color: #166534; border-radius: 0.6rem; font-size: 0.85rem; font-weight: 700; margin-bottom: 1.25rem;">
                 {{ product.category }}
             </span>
 
-            <p class="text-muted"
-                style="font-size: 0.9rem; line-height: 1.5; height: 3em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+            <p
+                style="color: #64748b; font-size: 1rem; line-height: 1.6; margin-bottom: 1.75rem; height: 3.2rem; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
                 {{ product.description }}
             </p>
 
-            <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--gray-100);"
-                class="flex-between">
-                <span style="font-size: 1.4rem; font-weight: 800; color: var(--primary);">₹{{ product.adjusted_price
-                    }}</span>
+            <div
+                style="padding-top: 1.5rem; border-top: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <span
+                        style="display: block; font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: 800; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Price</span>
+                    <span style="font-size: 1.85rem; font-weight: 900; color: #166534;">₹{{ product.adjusted_price or
+                        product.price }}</span>
+                </div>
                 {% if session.get('user') %}
-                <a href="/checkout/{{ product._id }}" class="btn btn-primary">
-                    Buy Now <i class="fas fa-arrow-right"></i>
+                <a href="/checkout/{{ product._id }}" class="btn"
+                    style="background: #166534; color: #ffffff; padding: 0.85rem 1.75rem; border-radius: 0.875rem; font-weight: 700; text-decoration: none; box-shadow: 0 4px 6px -1px rgba(22, 101, 52, 0.2);">
+                    Buy Now
                 </a>
                 {% else %}
-                <a href="/login" class="btn btn-primary">
+                <a href="/login" class="btn"
+                    style="background: #166534; color: #ffffff; padding: 0.85rem 1.75rem; border-radius: 0.875rem; font-weight: 700; text-decoration: none; box-shadow: 0 4px 6px -1px rgba(22, 101, 52, 0.2);">
                     Login to Buy
                 </a>
                 {% endif %}
@@ -111,20 +112,56 @@
         </div>
         {% endfor %}
     </div>
-
-    {% if products|length > 6 %}
-    <div style="text-align: center; margin-top: 2rem;">
-        <a href="/login" class="btn btn-primary">
-            View All {{ products|length }} Products <i class="fas fa-arrow-right"></i>
-        </a>
-    </div>
-    {% endif %}
     {% else %}
-    <div class="card" style="text-align: center; padding: 3rem;">
-        <i class="fas fa-box-open fa-4x text-muted mb-4"></i>
-        <h3 class="text-muted">No products available yet</h3>
-        <p class="text-muted">Be the first to list your products!</p>
+    <!-- Empty State (Matches Image Perfectly) -->
+    <div
+        style="text-align: center; padding: 8rem 2rem; border: 2px dashed #e2e8f0; border-radius: 2rem; background: #ffffff; margin-bottom: 4rem;">
+        <div style="margin-bottom: 2rem;">
+            <i class="fas fa-search fa-6x" style="color: #64748b; opacity: 0.3;"></i>
+        </div>
+        <h3 style="font-size: 2rem; font-weight: 800; color: #1e293b; margin-bottom: 1rem;">No products found</h3>
+        <p style="color: #64748b; font-size: 1.25rem; max-width: 500px; margin: 0 auto; line-height: 1.6;">Try adjusting
+            your filters or search terms.</p>
     </div>
     {% endif %}
+
+    <!-- Newsletter Banner (Matches Image Footer) -->
+    <div
+        style="margin-top: 8rem; padding: 5rem; background: #000000; border-radius: 2.5rem; color: white; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 4rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);">
+        <div style="max-width: 600px;">
+            <h2
+                style="color: white; font-size: 2.75rem; font-weight: 900; margin-bottom: 1.25rem; letter-spacing: -0.025em; line-height: 1.1;">
+                Don't miss the next harvest</h2>
+            <p style="color: #94a3b8; font-size: 1.25rem; line-height: 1.7;">Join 50,000+ stakeholders receiving
+                real-time market updates.</p>
+        </div>
+        <div style="display: flex; gap: 1.25rem; flex: 1; min-width: 320px; justify-content: flex-end;">
+            <input type="email" class="form-control"
+                style="background: #1e293b; border: 1px solid #334155; color: white; padding: 1.25rem 1.75rem; border-radius: 1rem; flex: 1; max-width: 400px; font-size: 1.1rem;"
+                placeholder="Email address">
+            <button class="btn"
+                style="background: #166534; color: white; padding: 1.25rem 2.5rem; border-radius: 1rem; font-weight: 800; font-size: 1.1rem; border: none; cursor: pointer; transition: all 0.2s;">
+                Subscribe
+            </button>
+        </div>
+    </div>
 </div>
+
+<style>
+    .btn:hover {
+        filter: brightness(1.2);
+        transform: translateY(-2px);
+    }
+
+    .card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #166534 !important;
+        box-shadow: 0 0 0 4px rgba(22, 101, 52, 0.1);
+    }
+</style>
 {% endblock %}
