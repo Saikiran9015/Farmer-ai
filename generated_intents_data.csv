@@ -1,0 +1,506 @@
+text,intent
+"I'm a farmer, how can I join the platform?",farmer_registration
+Farmer sign-up guide,farmer_registration
+Steps to register as a farmer?,farmer_registration
+Start selling as farmer,farmer_registration
+Set up farmer profile,farmer_registration
+I need to register my farm,farmer_registration
+Starting as a farmer on your platform,farmer_registration
+Farmer account creation process,farmer_registration
+What documents for farmer signup?,farmer_registration
+Farmer account help,farmer_registration
+Becoming a farmer member,farmer_registration
+How do farmers get started?,farmer_registration
+Guide for farmer sign up,farmer_registration
+What's the process for farmers?,farmer_registration
+Join your farmer network,farmer_registration
+Register my agricultural business,farmer_registration
+New farmer user,farmer_registration
+New agricultural supplier registration,farmer_registration
+Guide me to farmer signup,farmer_registration
+Register my farm here,farmer_registration
+Sign up my farm,farmer_registration
+New farmer registration,farmer_registration
+How to join as a food producer?,farmer_registration
+Help with farmer registration,farmer_registration
+Farmers onboarding process,farmer_registration
+Farmer sign up assistance,farmer_registration
+Is farmer registration free?,farmer_registration
+How do I list my farm?,farmer_registration
+How do I sign up as a farmer?,farmer_registration
+Farmer registration instructions,farmer_registration
+Enroll as a farmer,farmer_registration
+Become a verified buyer,buyer_registration
+How to buy produce?,buyer_registration
+How to access buyer features?,buyer_registration
+Join as merchant,buyer_registration
+Looking to purchase from farmers,buyer_registration
+New buyer registration form,buyer_registration
+Buyer onboarding guide,buyer_registration
+How to get buyer access?,buyer_registration
+Buyer account assistance,buyer_registration
+Register my grocery store,buyer_registration
+Looking to register my shop,buyer_registration
+Register as a bulk purchaser,buyer_registration
+How to create a buyer account?,buyer_registration
+Wholesaler signup process,buyer_registration
+Register my distribution company,buyer_registration
+How can businesses register?,buyer_registration
+Register as a food processor,buyer_registration
+Can my company register?,buyer_registration
+Register my food service,buyer_registration
+What's the business registration process?,buyer_registration
+Buyer account setup,buyer_registration
+Sign up my commercial enterprise,buyer_registration
+I want to register as a buyer,buyer_registration
+Business signup steps,buyer_registration
+What documents for business account?,buyer_registration
+Buyer signup instructions,buyer_registration
+Sign up my retail business,buyer_registration
+Sign up as a procurement manager,buyer_registration
+Register my catering service,buyer_registration
+New B2B account,buyer_registration
+Help listing my corn,list_crops
+Upload harvest information,list_crops
+How to set crop availability?,list_crops
+Where to add my new crop yield?,list_crops
+List my herbs,list_crops
+Add product for sale,list_crops
+How to specify quantity for crops?,list_crops
+Where can I upload my produce?,list_crops
+Updating crop inventory,list_crops
+Managing listed crops,list_crops
+Can I list organic produce?,list_crops
+Sell my dairy products,list_crops
+What info is needed to list crops?,list_crops
+Add a new crop listing,list_crops
+Listing process for produce,list_crops
+List my vegetables,list_crops
+How to offer my vegetables?,list_crops
+Where do I enter crop price?,list_crops
+How to post an available crop?,list_crops
+Posting my agricultural products,list_crops
+Steps to list new produce,list_crops
+Help listing my produce,list_crops
+Upload crop details,list_crops
+Crop listing instructions,list_crops
+Guide to listing crops,list_crops
+Sell my grain,list_crops
+Adding a new vegetable type,list_crops
+How to remove a listed crop?,list_crops
+How to describe my crops?,list_crops
+Adding fruits for sale,list_crops
+Selling my potatoes,list_crops
+Listing harvested goods,list_crops
+Selling my tomatoes,list_crops
+What's the going rate for milk?,price_inquiry
+Price comparison for soybeans,price_inquiry
+Current rates for green beans,price_inquiry
+Market value of apples,price_inquiry
+Price information for farmers,price_inquiry
+Fair price for my produce,price_inquiry
+What price should I list?,price_inquiry
+What influences crop prices?,price_inquiry
+Historical prices for onions,price_inquiry
+Selling price for my crop,price_inquiry
+How to determine my selling price?,price_inquiry
+Current mandi rates for rice,price_inquiry
+Price of wheat per quintal,price_inquiry
+Market insights for pricing,price_inquiry
+Where can I see live prices?,price_inquiry
+Pricing guidance for farmers,price_inquiry
+Average market price for potatoes,price_inquiry
+Pricing advice for farmers,price_inquiry
+Understanding crop prices,price_inquiry
+How are prices calculated?,price_inquiry
+Price for organic vegetables,price_inquiry
+What is today's market price for tomatoes?,price_inquiry
+Pricing tools on platform,price_inquiry
+How much should I sell my crops for?,price_inquiry
+Price trends for mangoes,price_inquiry
+How do I get a price recommendation?,price_inquiry
+Latest prices for grapes,price_inquiry
+Average price of bananas,price_inquiry
+Price forecasting for crops,price_inquiry
+Best price for my produce,price_inquiry
+Suggested price for carrots,price_inquiry
+Price for corn per ton,price_inquiry
+Price for cabbage today,price_inquiry
+Update on my pending order,order_tracking
+Can I get an update on my shipment?,order_tracking
+Need to track an order,order_tracking
+Where is my produce in transit?,order_tracking
+Is my package on its way?,order_tracking
+My order hasn't arrived,order_tracking
+Order not yet delivered,order_tracking
+Delivery update for my produce,order_tracking
+Where is my current order?,order_tracking
+Where is my vegetable order?,order_tracking
+My delivery is late,order_tracking
+Is my farm delivery on schedule?,order_tracking
+Tracking a specific order,order_tracking
+Delivery expected when?,order_tracking
+Shipment status inquiry,order_tracking
+When will my order arrive?,order_tracking
+Check my recent purchase status,order_tracking
+Where is my farm order?,order_tracking
+Order delivery update,order_tracking
+Order tracking details,order_tracking
+Has my produce shipped?,order_tracking
+What's happening with my order?,order_tracking
+How to track my order?,order_tracking
+When is my delivery scheduled?,order_tracking
+Order status check,order_tracking
+Has my order been dispatched?,order_tracking
+My order is delayed,order_tracking
+Delivery timeline for my crops,order_tracking
+Where is my order?,order_tracking
+Track shipment for my produce,order_tracking
+Order tracking for farmers,order_tracking
+Tracking farmer's delivery,order_tracking
+What is the tracking number?,order_tracking
+Locate my recent purchase,order_tracking
+Help with a bad delivery,delivery_help
+How do I complain about delivery?,delivery_help
+The quality of my delivered produce is poor,delivery_help
+The produce is not up to standard from delivery,delivery_help
+Delivery problem for order #987,delivery_help
+My delivery came late and spoiled,delivery_help
+Received incorrect amount,delivery_help
+Issues with my produce delivery,delivery_help
+How to report a delivery issue?,delivery_help
+Received fewer items than ordered,delivery_help
+Delivery error report,delivery_help
+Bad quality produce on arrival,delivery_help
+Can I get a refund for delivery issues?,delivery_help
+Delivery problem support,delivery_help
+There was a mistake in my delivery,delivery_help
+Help with delivery error,delivery_help
+Delivery not as expected,delivery_help
+My shipment is damaged,delivery_help
+How to resolve a delivery issue?,delivery_help
+Some items were missing from delivery,delivery_help
+My produce is not fresh on arrival,delivery_help
+My order arrived spoiled,delivery_help
+Report a delivery discrepancy,delivery_help
+Delivery support needed,delivery_help
+Who handles delivery disputes?,delivery_help
+Missing items in my order,delivery_help
+Issue with quantity delivered,delivery_help
+Received the wrong crops,delivery_help
+The order was not fulfilled correctly,delivery_help
+Request for produce pickup,logistics_request
+How to organize transport?,logistics_request
+Transport my fruits to market,logistics_request
+Transportation for bulk orders,logistics_request
+Ship my grains,logistics_request
+Transportation cost for produce,logistics_request
+Need to get my crops moved,logistics_request
+Logistics scheduling assistance,logistics_request
+Can you arrange pickup from my farm?,logistics_request
+Need help with produce transportation,logistics_request
+Request a pickup service,logistics_request
+How to arrange pickup from a farmer?,logistics_request
+Delivery arrangements for farmers,logistics_request
+Logistics support for farmers,logistics_request
+How to get my produce shipped?,logistics_request
+Do you offer cold chain logistics?,logistics_request
+Need help delivering crops,logistics_request
+Request a specific vehicle type,logistics_request
+Is delivery available for farmers?,logistics_request
+Need transportation for my produce,logistics_request
+Do you provide transport for my crops?,logistics_request
+Arrange freight for my order,logistics_request
+How to manage delivery logistics?,logistics_request
+Logistics services for the platform,logistics_request
+Can I schedule a delivery?,logistics_request
+Transportation services for agriculture,logistics_request
+Delivery for my wholesale order,logistics_request
+Scheduling produce transport,logistics_request
+Logistics partner options,logistics_request
+What are the shipping options?,logistics_request
+How to get my crops to buyers?,logistics_request
+How does logistics work on the platform?,logistics_request
+Can I get delivery to my warehouse?,logistics_request
+Where is my payment?,payment_issue
+Payment issue assistance,payment_issue
+Payment not reflected,payment_issue
+When does payment get processed?,payment_issue
+Inquiry about payment settlement,payment_issue
+When will the money hit my bank?,payment_issue
+Payment support for farmers,payment_issue
+When will I receive payment for my sale?,payment_issue
+Why is my payment late?,payment_issue
+Didn't get paid for my produce,payment_issue
+Has my payment been released?,payment_issue
+Delayed payment for my goods,payment_issue
+My payout is late,payment_issue
+Why haven't I been paid?,payment_issue
+Funds are not in my account,payment_issue
+Check my payment status,payment_issue
+Problem with money transfer,payment_issue
+Payment inquiry for recent sale,payment_issue
+Money not credited to my account,payment_issue
+What to do about a payment problem?,payment_issue
+Payment concern for order 789,payment_issue
+Payment not received,payment_issue
+Need help with a payment discrepancy,payment_issue
+How to resolve payment issues?,payment_issue
+Payment for sale #456,payment_issue
+Issue with my recent payment,payment_issue
+My payment is delayed,payment_issue
+Payment assistance needed,payment_issue
+Can you check my payment?,payment_issue
+My account hasn't been credited,payment_issue
+Funds not cleared,payment_issue
+Problem with funds withdrawal,payment_issue
+Problem with transaction for my produce,payment_issue
+How to check payment status?,payment_issue
+Quality control process,quality_check
+Standards for agricultural products,quality_check
+How to ensure produce quality?,quality_check
+Are there quality inspectors?,quality_check
+Freshness guarantee for vegetables,quality_check
+Received inferior quality crops,quality_check
+Produce quality dispute,quality_check
+How to complain about low quality produce?,quality_check
+How do you ensure high quality?,quality_check
+Quality verification steps,quality_check
+Received bad quality vegetables,quality_check
+Quality evaluation process,quality_check
+What is your quality guarantee?,quality_check
+Ensuring product freshness,quality_check
+Is there a quality check before shipping?,quality_check
+Checking produce freshness,quality_check
+How to complain about product freshness?,quality_check
+My received produce is low quality,quality_check
+My order's quality is not good,quality_check
+Quality check for my order,quality_check
+What quality metrics do you use?,quality_check
+Reporting poor quality produce,quality_check
+Dispute resolution for quality,quality_check
+My received produce looks bad,quality_check
+How does quality checking work for produce?,quality_check
+Quality assessment information,quality_check
+Quality control for farmers' goods,quality_check
+What quality checks are performed?,quality_check
+What happens if quality is poor?,quality_check
+Can't update my farm details,account_issue
+Account privacy settings,account_issue
+Help for a blocked account,account_issue
+My account details are wrong,account_issue
+Account recovery assistance,account_issue
+Problem with my business account,account_issue
+Cannot access my farmer account,account_issue
+Resetting login credentials,account_issue
+Trouble accessing farmer dashboard,account_issue
+Cannot change my address,account_issue
+Accessing my old account,account_issue
+Need to reset my password,account_issue
+My account has been suspended,account_issue
+Update my personal information,account_issue
+My account is locked,account_issue
+Login problem assistance,account_issue
+What to do if my account is compromised?,account_issue
+Account registration issue,account_issue
+My profile details are incorrect,account_issue
+I can't log into my account,account_issue
+Forgot my username,account_issue
+Change my registered email,account_issue
+Account deletion request,account_issue
+Buyer account locked out,account_issue
+Contact support for account help,account_issue
+Trouble with account settings,account_issue
+Why choose direct trade?,platform_benefits
+Benefits of direct selling,platform_benefits
+What's good about this platform?,platform_benefits
+Advantages of using this marketplace,platform_benefits
+Advantages of buying from farmers directly,platform_benefits
+Why use this agricultural platform?,platform_benefits
+Benefits for small businesses,platform_benefits
+What are the primary benefits?,platform_benefits
+Why should I switch to your platform?,platform_benefits
+What value does your platform add?,platform_benefits
+How does this platform ensure quality?,platform_benefits
+How does it reduce costs?,platform_benefits
+What are the long-term benefits?,platform_benefits
+Benefits of fair trade,platform_benefits
+How does direct sourcing help?,platform_benefits
+Advantages of transparent trade,platform_benefits
+How does this platform help me grow?,platform_benefits
+How does it save money?,platform_benefits
+Benefits for food processors,platform_benefits
+What are the advantages for buyers?,platform_benefits
+Benefits of ethical sourcing,platform_benefits
+How does this platform empower farmers?,platform_benefits
+What are the gains for businesses?,platform_benefits
+Benefits for the supply chain,platform_benefits
+Why is this an effective solution?,platform_benefits
+Advantages of the app,platform_benefits
+What are the upsides of using this app?,platform_benefits
+What are the unique features?,platform_benefits
+How does this platform offer better prices?,platform_benefits
+Benefits of no middlemen,platform_benefits
+Why should farmers use this platform?,platform_benefits
+How do you connect farmers and buyers directly?,no_broker_explanation
+How does direct selling impact profitability?,no_broker_explanation
+What is the role of brokers here?,no_broker_explanation
+Explain the direct farm-to-table approach,no_broker_explanation
+Explain how you cut out the middleman,no_broker_explanation
+What does it mean for pricing?,no_broker_explanation
+What does 'no-broker marketplace' mean?,no_broker_explanation
+Explain the direct sourcing model,no_broker_explanation
+Explain the direct supply chain,no_broker_explanation
+Benefits of a broker-free system,no_broker_explanation
+How do you ensure efficiency without brokers?,no_broker_explanation
+What is the benefit of cutting out middlemen?,no_broker_explanation
+How do you facilitate direct dealings?,no_broker_explanation
+How does direct trade work without brokers?,no_broker_explanation
+What's the concept of no-brokerage?,no_broker_explanation
+Explain direct farmer to business trade,no_broker_explanation
+How does this platform protect farmers from exploitation?,no_broker_explanation
+What are the advantages of a no-broker system?,no_broker_explanation
+Explain the benefits of direct commerce,no_broker_explanation
+How does this platform create a direct link?,no_broker_explanation
+What does it mean to remove brokers?,no_broker_explanation
+Explain the no-broker model,no_broker_explanation
+What does 'direct' imply for trade?,no_broker_explanation
+How do you eliminate brokers?,no_broker_explanation
+How do farmers get better margins?,no_broker_explanation
+How do you connect food producers and buyers directly?,no_broker_explanation
+What is the 'no-middleman' concept?,no_broker_explanation
+How does this platform differ from traditional markets?,no_broker_explanation
+Explain the direct purchasing model,no_broker_explanation
+Explain the direct sales channel,no_broker_explanation
+How do you bypass traditional supply chains?,no_broker_explanation
+Explain direct producer-consumer connection,no_broker_explanation
+How does it simplify transactions without brokers?,no_broker_explanation
+Need help with the platform's app,app_help
+How to search for produce in the app?,app_help
+My app is showing an error,app_help
+How do I use the app?,app_help
+Where is the settings menu?,app_help
+How to get started with the app?,app_help
+App feedback and suggestions,app_help
+App notifications not working,app_help
+App tutorial videos,app_help
+Assistance with the mobile interface,app_help
+My app is crashing,app_help
+How to reset app data?,app_help
+Can't upload photos in app,app_help
+App error messages,app_help
+Problems with the platform interface,app_help
+What are the app requirements?,app_help
+I need help navigating the platform,app_help
+How to change language in app?,app_help
+Troubleshooting app issues,app_help
+App performance issues,app_help
+The application is slow,app_help
+App is not loading content,app_help
+Where are the app instructions?,app_help
+App support needed,app_help
+Where can I find app tutorials?,app_help
+Help with app features,app_help
+Trouble with the mobile application,app_help
+How to re-install the app?,app_help
+How to update the app?,app_help
+How to use specific app functions?,app_help
+App usage questions,app_help
+I need personal assistance,support_request
+My issue isn't listed,support_request
+How to get in touch with customer care?,support_request
+Helpdesk contact,support_request
+Need urgent help,support_request
+Need an agent to review my case,support_request
+General questions about my account,support_request
+I need further assistance,support_request
+How to get live support?,support_request
+Contact for general inquiries,support_request
+Need some help,support_request
+Need help with something else,support_request
+General platform assistance,support_request
+How to submit a support ticket?,support_request
+Can I chat with a representative?,support_request
+Contact for a specific problem,support_request
+Technical support needed,support_request
+Contact a human agent,support_request
+Can I get assistance?,support_request
+I need to speak to customer service,support_request
+Help with an unspecified problem,support_request
+Assistance with my issue,support_request
+General query about the platform,support_request
+Customer care contact,support_request
+Support team contact,support_request
+Reach out to support staff,support_request
+Help with any issue,support_request
+Where is your help center?,support_request
+Where can I find FAQs?,support_request
+I have a complex problem,support_request
+I have a general inquiry,support_request
+I have an unlisted question,support_request
+"Hi, I'm reaching out",greeting
+"Hello, can you hear me?",greeting
+Is anyone there?,greeting
+"Hello, support",greeting
+Hey you,greeting
+"Hello, is this customer service?",greeting
+"Hi, how can you help?",greeting
+Greetings from a farmer,greeting
+"Hi, how's it going?",greeting
+Hey assistant,greeting
+Good evening,greeting
+"Hello, I'm here",greeting
+"Hello, good day",greeting
+"Hi, can you assist?",greeting
+Hello,greeting
+"Hello, just saying hi",greeting
+Nice to meet you,greeting
+"Hi, I need help",greeting
+Hello there,greeting
+Hey friend,greeting
+Hi bot,greeting
+Greetings,greeting
+"Hello, platform support",greeting
+Hey there,greeting
+Hi,greeting
+"Hi, could you help me?",greeting
+Good to see you,greeting
+"Hi, looking for info",greeting
+"Hi, got a question",greeting
+"Hello, support bot",greeting
+"Hey, got a moment?",greeting
+Good afternoon,greeting
+Good morning,greeting
+"Hi, I have a question",greeting
+Are you a bot?,greeting
+Bye for now,goodbye
+"That was helpful, bye",goodbye
+Over and out,goodbye
+End chat,goodbye
+Leaving the platform,goodbye
+Cheers,goodbye
+Thanks for your help,goodbye
+All clear,goodbye
+"Bye, take care",goodbye
+I'm logging off,goodbye
+Signing off,goodbye
+Have a good day,goodbye
+That's all for now,goodbye
+Goodbye bot,goodbye
+Closing chat,goodbye
+Good bye now,goodbye
+So long,goodbye
+All done,goodbye
+See you,goodbye
+Closing the session,goodbye
+I'm leaving,goodbye
+See you again,goodbye
+Bye,goodbye
+Adios,goodbye
+Goodbye,goodbye
+See ya,goodbye
+Ending chat,goodbye
+Exiting conversation,goodbye
+I'm done,goodbye
+Got to go,goodbye
+"Bye, have a nice day",goodbye

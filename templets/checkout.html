@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout | KropKart{% endblock %}
+
+{% block content %}
+<div class="animate-fade" style="max-width: 800px; margin: 0 auto;">
+    <div class="card">
+        <div class="flex-between mb-4" style="border-bottom: 2px solid var(--gray-100); padding-bottom: 1rem;">
+            <h2 class="text-primary"><i class="fas fa-shopping-cart"></i> Secure Checkout</h2>
+            <span class="badge badge-ai"><i class="fas fa-shield-alt"></i> Razorpay Secured</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+            <!-- Product Image -->
+            <div style="border-radius: 1rem; overflow: hidden; background: var(--gray-100); height: 250px;">
+                {% if product.image %}
+                <img src="{{ product.image }}" class="img-cover" alt="{{ product.name }}">
+                {% else %}
+                <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
+                    <i class="fas fa-box fa-4x" style="color: var(--gray-300);"></i>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Product Details -->
+            <div>
+                <h3 style="margin-bottom: 0.5rem; font-size: 1.5rem;">{{ product.name }}</h3>
+                <span class="badge" style="background: var(--light); color: var(--primary); margin-bottom: 1rem;">
+                    {{ product.category }}
+                </span>
+
+                <p class="text-muted" style="margin-bottom: 1.5rem; line-height: 1.6;">{{ product.description }}</p>
+
+                <div style="background: var(--gray-50); padding: 1rem; border-radius: 0.5rem;">
+                    <div class="flex-between mb-2">
+                        <span class="text-muted">Base Price</span>
+                        <span>₹{{ product.price }}</span>
+                    </div>
+                    <div class="flex-between mb-2">
+                        <span class="text-muted">AI Quality Adjustment</span>
+                        <span class="text-primary">+ ₹{{ ((product.adjusted_price|float) -
+                            (product.price|float))|round(2) }}</span>
+                    </div>
+                    <div class="flex-between"
+                        style="border-top: 1px solid var(--gray-200); padding-top: 0.5rem; margin-top: 0.5rem; font-weight: 800; font-size: 1.2rem;">
+                        <span>Total Pay</span>
+                        <span>₹{{ product.adjusted_price }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Actions -->
+        <div style="text-align: right;">
+            <a href="/dashboard" class="btn btn-secondary" style="margin-right: 1rem;">Cancel</a>
+            <button id="payBtn" class="btn btn-primary" style="padding: 0.8rem 2rem; font-size: 1.1rem;">
+                <i class="fas fa-lock"></i> Pay ₹{{ product.adjusted_price }} Now
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('payBtn').onclick = async function (e) {
+        e.preventDefault();
+        const btn = this;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        btn.disabled = true;
+
+        const options = {
+            key: "{{ RAZORPAY_KEY_ID }}",
+            amount: {{ (product.adjusted_price | float * 100) | int
+    }},
+    currency: "INR",
+        name: "KropKart Market",
+            description: "Order for {{ product.name }}",
+                image: "{{ url_for('serve_statics', filename='krop.png') }}",
+                    handler: async function (response) {
+                        try {
+                            const res = await fetch('/verify_payment', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    product_id: "{{ product._id }}",
+                                    amount: "{{ product.adjusted_price }}",
+                                    razorpay_payment_id: response.razorpay_payment_id,
+                                    razorpay_order_id: response.razorpay_order_id,
+                                    razorpay_signature: response.razorpay_signature
+                                })
+                            });
+                            const data = await res.json();
+                            if (data.status === 'success') {
+                                window.location.href = "/dashboard?payment=success";
+                            } else {
+                                alert("Payment verification failed. Please contact support.");
+                                btn.innerHTML = '<i class="fas fa-lock"></i> Pay Now';
+                                btn.disabled = false;
+                            }
+                        } catch (err) {
+                            console.error(err);
+                            alert("Server error during verification.");
+                        }
+                    },
+    prefill: {
+        name: "{{ session.get('name') }}",
+            email: "{{ session.get('user') }}"
+    },
+    theme: {
+        color: "#22c55e"
+    },
+    modal: {
+        ondismiss: function() {
+            btn.innerHTML = '<i class="fas fa-lock"></i> Pay Now';
+            btn.disabled = false;
+        }
+    }
+        };
+    const rzp = new Razorpay(options);
+    rzp.open();
+    }
+</script>
+{% endblock %}

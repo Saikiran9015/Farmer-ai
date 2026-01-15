@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}List New Product | KropKart{% endblock %}
+
+{% block content %}
+<div class="animate-fade" style="display: flex; justify-content: center; padding: 2rem 0;">
+    <div class="card" style="width: 700px; max-width: 100%;">
+        <div class="flex-between mb-8" style="border-bottom: 2px solid var(--gray-100); padding-bottom: 1rem;">
+            <div>
+                {% if session.get('user_type') == 'farmer' %}
+                <h2 class="text-primary"><i class="fas fa-seedling"></i> Upload Harvest</h2>
+                <small class="text-muted">List your produce for buyers across the country</small>
+                {% else %}
+                <h2 style="color: var(--dark);"><i class="fas fa-boxes"></i> Industrial Listing</h2>
+                <small class="text-muted">List processed goods, machinery, or bulk inventory</small>
+                {% endif %}
+            </div>
+            <a href="/dashboard" class="btn btn-secondary">Cancel</a>
+        </div>
+
+        <form action="/add_product" method="POST" enctype="multipart/form-data">
+            {% if session.get('user_type') == 'farmer' %}
+            <!-- FARMER FORM -->
+            <div class="form-group">
+                <label class="form-label">Crop Name</label>
+                <div style="position: relative;">
+                    <i class="fas fa-carrot"
+                        style="position: absolute; left: 1rem; top: 1rem; color: var(--gray-400);"></i>
+                    <input type="text" name="name" class="form-control" style="padding-left: 2.5rem;"
+                        placeholder="e.g. Sharbati Wheat, Red Onion, Alphonso Mango" required>
+                </div>
+            </div>
+
+            <div class="grid-cols-auto" style="gap: 1.5rem; grid-template-columns: 1fr 1fr;">
+                <div class="form-group">
+                    <label class="form-label">Price per Quintal (₹)</label>
+                    <div style="position: relative;">
+                        <span
+                            style="position: absolute; left: 1rem; top: 0.8rem; font-weight: bold; color: var(--gray-500);">₹</span>
+                        <input type="number" name="price" class="form-control" style="padding-left: 2.5rem;"
+                            placeholder="0.00" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Crop Category</label>
+                    <div style="position: relative;">
+                        <i class="fas fa-th-large"
+                            style="position: absolute; left: 1rem; top: 1rem; color: var(--gray-400);"></i>
+                        <select name="category" class="form-control" style="padding-left: 2.5rem;">
+                            <optgroup label="Cereals">
+                                <option>Paddy (Rice)</option>
+                                <option>Wheat</option>
+                                <option>Maize</option>
+                                <option>Millet</option>
+                            </optgroup>
+                            <optgroup label="Pulses">
+                                <option>Gram (Chana)</option>
+                                <option>Lentil (Masoor)</option>
+                                <option>Tur (Arhar)</option>
+                            </optgroup>
+                            <optgroup label="Others">
+                                <option>Vegetables</option>
+                                <option>Fruits</option>
+                                <option>Oilseeds</option>
+                                <option>Spices</option>
+                                <option>Cotton</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Quality & Quantity Details</label>
+                <textarea name="description" class="form-control" rows="4"
+                    placeholder="E.g., 50 Quintals available. Harvested on 12th Jan. Moisture content 12%. Grade A quality."
+                    required></textarea>
+                <div
+                    style="margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--primary);">
+                    <i class="fas fa-robot"></i>
+                    <span>AI will scan this description to assign a Quality Score (High/Medium/Low).</span>
+                </div>
+            </div>
+
+            {% else %}
+            <!-- BUSINESS FORM -->
+            <div class="form-group">
+                <label class="form-label">Item Name</label>
+                <div style="position: relative;">
+                    <i class="fas fa-cube"
+                        style="position: absolute; left: 1rem; top: 1rem; color: var(--gray-400);"></i>
+                    <input type="text" name="name" class="form-control" style="padding-left: 2.5rem;"
+                        placeholder="e.g. Processed Wheat Flour (Atta), Tractor 50HP" required>
+                </div>
+            </div>
+
+            <div class="grid-cols-auto" style="gap: 1.5rem; grid-template-columns: 1fr 1fr;">
+                <div class="form-group">
+                    <label class="form-label">Unit Price (₹)</label>
+                    <div style="position: relative;">
+                        <span
+                            style="position: absolute; left: 1rem; top: 0.8rem; font-weight: bold; color: var(--gray-500);">₹</span>
+                        <input type="number" name="price" class="form-control" style="padding-left: 2.5rem;"
+                            placeholder="0.00" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <div style="position: relative;">
+                        <i class="fas fa-layer-group"
+                            style="position: absolute; left: 1rem; top: 1rem; color: var(--gray-400);"></i>
+                        <select name="category" class="form-control" style="padding-left: 2.5rem;">
+                            <optgroup label="Agri-Inputs">
+                                <option>Seeds</option>
+                                <option>Fertilizer</option>
+                                <option>Pesticides</option>
+                            </optgroup>
+                            <optgroup label="Equipment">
+                                <option>Machinery</option>
+                                <option>Tools</option>
+                                <option>Irrigation</option>
+                            </optgroup>
+                            <optgroup label="Output">
+                                <option>Processed Food</option>
+                                <option>Bulk Grain</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Technical Specifications</label>
+                <textarea name="description" class="form-control" rows="4"
+                    placeholder="Detail the specifications, warranty, shelf life, or bulk availability..."
+                    required></textarea>
+            </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label class="form-label">Product Image</label>
+                <div style="border: 2px dashed var(--gray-300); padding: 2rem; text-align: center; border-radius: var(--radius); background: var(--gray-50); transition: all 0.2s;"
+                    onmouseover="this.style.background='#f0fdf4'; this.style.borderColor='var(--primary)'"
+                    onmouseout="this.style.background='var(--gray-50)'; this.style.borderColor='var(--gray-300)'">
+                    <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                    <p class="text-muted" style="margin-bottom: 1rem;">Click to upload clear photo</p>
+                    <input type="file" name="image" class="form-control"
+                        style="border: none; background: transparent; padding: 0;">
+                </div>
+            </div>
+
+            <div style="padding-top: 1rem; border-top: 1px solid var(--gray-100);">
+                <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.1rem; padding: 1rem;">
+                    {% if session.get('user_type') == 'farmer' %}
+                    <i class="fas fa-check-circle"></i> Publish Harvest Listing
+                    {% else %}
+                    <i class="fas fa-upload"></i> List Industrial Stock
+                    {% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
