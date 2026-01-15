@@ -64,23 +64,38 @@
     document.getElementById('payBtn').onclick = async function (e) {
         e.preventDefault();
         const btn = this;
+        const originalText = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
         btn.disabled = true;
 
         try {
-            // Step 1: Create Order on Server
-            const orderRes = await fetch('/create_order', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    amount: {{ product.adjusted_price }}
+            // Check if Razorpay SDK is loaded
+            if (typeof Razorpay === 'undefined') {
+                throw new Error("Razorpay SDK not loaded. Please refresh the page.");
+            }
+
+            console.log("Creating order for amount:", {{ product.adjusted_price }});
+
+        // Step 1: Create Order on Server
+        const orderRes = await fetch('/create_order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                amount: {{ product.adjusted_price }}
                 })
-    });
+            });
+
+    if (!orderRes.ok) {
+        const errorText = await orderRes.text();
+        console.error("Order creation failed:", errorText);
+        throw new Error("Server error: " + orderRes.status);
+    }
 
     const orderData = await orderRes.json();
+    console.log("Order created successfully:", orderData);
 
     if (!orderData.id) {
-        throw new Error("Could not create order");
+        throw new Error("Invalid order response - missing order ID");
     }
 
     // Step 2: Initialize Razorpay
@@ -92,6 +107,7 @@
         description: "Order for {{ product.name }}",
         order_id: orderData.id,
         handler: async function (response) {
+            console.log("Payment successful, verifying...");
             try {
                 const res = await fetch('/verify_payment', {
                     method: 'POST',
@@ -106,17 +122,17 @@
         });
     const data = await res.json();
     if (data.status === 'success') {
-        alert("Payment Successful! ✅");
+        alert("✅ Payment Successful!");
         window.location.href = "/dashboard";
     } else {
-        alert("Payment verification failed. Please contact support.");
-        btn.innerHTML = '<i class="fas fa-lock"></i> Pay Now';
+        alert("❌ Payment verification failed. Please contact support.");
+        btn.innerHTML = originalText;
         btn.disabled = false;
     }
                     } catch (err) {
-        console.error(err);
-        alert("Server error during verification.");
-        btn.innerHTML = '<i class="fas fa-lock"></i> Pay Now';
+        console.error("Verification error:", err);
+        alert("Verification failed: " + err.message);
+        btn.innerHTML = originalText;
         btn.disabled = false;
     }
                 },
@@ -129,26 +145,29 @@
     },
     modal: {
         ondismiss: function() {
-            btn.innerHTML = '<i class="fas fa-lock"></i> Pay Now';
+            console.log("Payment cancelled by user");
+            btn.innerHTML = originalText;
             btn.disabled = false;
         }
     }
             };
 
+    console.log("Opening Razorpay checkout...");
     const rzp = new Razorpay(options);
 
     rzp.on('payment.failed', function (response) {
-        alert("Payment Failed: " + response.error.description);
-        btn.innerHTML = '<i class="fas fa-lock"></i> Pay Now';
+        console.error("Payment failed:", response.error);
+        alert("❌ Payment Failed: " + response.error.description);
+        btn.innerHTML = originalText;
         btn.disabled = false;
     });
 
     rzp.open();
             
         } catch (err) {
-        console.error(err);
-        alert("Error initiating payment. Please try again.");
-        btn.innerHTML = '<i class="fas fa-lock"></i> Pay Now';
+        console.error("Payment error:", err);
+        alert("Error: " + err.message + "\n\nPlease check your internet connection and try again.");
+        btn.innerHTML = originalText;
         btn.disabled = false;
     }
     }
