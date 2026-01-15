@@ -13,6 +13,8 @@ import os
 from datetime import datetime
 import math
 import json
+import random
+import traceback
 
 # Load env variables
 load_dotenv()
@@ -34,19 +36,30 @@ db = None
 
 def ensure_db_connection():
     global db
-    if db is not None: return db
+    if db is not None:
+        return db
+    
+    uri = os.getenv("MONGO_URI")
+    if not uri:
+        print("CRITICAL ERROR: MONGO_URI not found in environment variables!")
+        return None
+        
     try:
-        client = pymongo.MongoClient(mongo_uri, serverSelectionTimeoutMS=5000)
+        client = pymongo.MongoClient(uri, serverSelectionTimeoutMS=5000)
         try:
             db = client.get_default_database()
-        except:
-            parsed = urlparse(mongo_uri)
+        except Exception:
+            parsed = urlparse(uri)
             dbname = parsed.path.lstrip('/') or 'KropKart'
             db = client[dbname]
+        
+        # Verify connection
         client.admin.command('ping')
+        print(f"Connected to database: {db.name}")
         return db
     except Exception as e:
-        print(f"DB Error: {e}")
+        print(f"Database Connection Error: {e}")
+        traceback.print_exc()
         return None
 
 def init_db():
@@ -81,7 +94,9 @@ def serve_statics(filename):
 @app.route("/")
 def index():
     db_local = ensure_db_connection()
-    products = list(db_local.products.find().sort("created_at", -1))  # Latest products first
+    products = list(db_local.products.find().sort("created_at", -1))
+    for p in products:
+        p['rating'] = round(random.uniform(3.5, 5.0), 1)
     return render_template("index.html", products=products)
 
 @app.route("/register", methods=["GET", "POST"])
@@ -132,24 +147,26 @@ def dashboard():
 @app.route("/landing") # Farmer Landing
 def landing():
     db_local = ensure_db_connection()
-    # Farmers see their own products and can add more
     products = list(db_local.products.find({"owner": session.get("user")}))
+    for p in products:
+        p['rating'] = round(random.uniform(3.5, 5.0), 1)
     return render_template("landing.html", products=products)
 
 @app.route("/landingb") # Business Landing/Control Panel
 def landingb():
     db_local = ensure_db_connection()
-    # Business page should show ALL products available for bulk sourcing (Farmers + Other Businesses)
-    # The previous logic limited it to only farmers. Expanding to all listings.
     products = list(db_local.products.find())
+    for p in products:
+        p['rating'] = round(random.uniform(3.5, 5.0), 1)
     return render_template("landingb.html", products=products)
 
 @app.route("/citizen") # Citizen Landing
 def citizen():
     db_local = ensure_db_connection()
-    # Normal people see ALL products
-    products = list(db_local.products.find())
-    return render_template("citizen.html", products=products)
+    products = list(db_local.products.find().sort("created_at", -1))
+    for p in products:
+        p['rating'] = round(random.uniform(3.5, 5.0), 1)
+    return render_template("index.html", products=products)
 
 @app.route("/add-listing")
 def add_listing_page():
@@ -368,7 +385,8 @@ def admin():
 @app.route("/logout")
 def logout():
     session.clear()
-    return redirect("/login")
+    flash("Successfully logged out!", "success")
+    return redirect("/")
 
 if __name__ == "__main__":
     init_db()
