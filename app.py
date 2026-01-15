@@ -114,7 +114,8 @@ def login():
         user = db_local.users.find_one({"email": email})
         if user and check_password_hash(user["password"], password):
             session.update({"user": user["email"], "name": user["name"], "user_type": user["user_type"]})
-            return redirect("/dashboard")
+            flash(f"Welcome back, {user['name']}!", "success")
+            return redirect("/")  # Redirect to home page
         flash("Invalid credentials", "error")
     return render_template("login.html")
 
