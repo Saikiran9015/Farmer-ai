@@ -225,6 +225,33 @@ def verify_payment():
         print(e)
         return jsonify({"status": "failed"}), 400
 
+# Webhook Setup
+RAZORPAY_WEBHOOK_SECRET = os.getenv("RAZORPAY_WEBHOOK_SECRET", "Saikiran9493@#")
+
+@app.route("/webhook", methods=["POST"])
+def webhook():
+    # Verify the signature
+    signature = request.headers.get('X-Razorpay-Signature')
+    body = request.get_data().decode('utf-8')
+
+    try:
+        razorpay_client.utility.verify_webhook_signature(body, signature, RAZORPAY_WEBHOOK_SECRET)
+        
+        # Process the event
+        event = request.json
+        if event['event'] == 'payment.captured':
+            payment = event['payload']['payment']['entity']
+            # Here you can update order status in DB if needed (server-to-server confirmation)
+            # db_local.orders.update_one(...)
+            print(f"Payment Captured: {payment['id']}")
+            
+        return jsonify({"status": "ok"}), 200
+    except razorpay.errors.SignatureVerificationError:
+        return jsonify({"status": "error", "message": "Invalid Signature"}), 400
+    except Exception as e:
+        print(e)
+        return jsonify({"status": "error"}), 500
+
 # AI CHATBOT API
 @app.route("/api/chat", methods=["POST"])
 def chat():
