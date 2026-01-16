@@ -53,7 +53,8 @@
         <!-- Payment Actions -->
         <div style="text-align: right;">
             <a href="/dashboard" class="btn btn-secondary" style="margin-right: 1rem;">Cancel</a>
-            <button id="payBtn" class="btn btn-primary" style="padding: 0.8rem 2rem; font-size: 1.1rem;">
+            <button id="payBtn" class="btn btn-primary"
+                style="padding: 0.8rem 2rem; font-size: 1.1rem; border: none; cursor: pointer; border-radius: 0.75rem;">
                 <i class="fas fa-lock"></i> Pay ₹{{ product.adjusted_price }} Now
             </button>
         </div>
@@ -61,94 +62,129 @@
 </div>
 
 <script>
-    // Configuration from Server
+    // Configuration from Server - Using tojson for maximum safety
     const CONFIG = {
-        razorpayKey: "{{ RAZORPAY_KEY_ID }}",
-        productId: "{{ product._id }}",
-        productName: "{{ product.name|replace('\'', '') }}",
-        amount: parseFloat("{{ product.adjusted_price or 0 }}"),
-        userEmail: "{{ session.get('user', '') }}",
-        userName: "{{ session.get('name', 'Customer') }}"
+        razorpayKey: {{ RAZORPAY_KEY_ID| tojson }},
+    productId: { { product._id | tojson } },
+    productName: { { product.name | tojson } },
+    amount: parseFloat({{ product.adjusted_price | tojson }}),
+        userEmail: { { session.get('user', '') | tojson } },
+    userName: { { session.get('name', 'Customer') | tojson } }
     };
 
-    document.getElementById('payBtn').onclick = async function (e) {
-        e.preventDefault();
-        const btn = this;
-        const originalText = btn.innerHTML;
+    console.log("KropKart Payment Config Loaded:", CONFIG);
 
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-        btn.disabled = true;
+    const payButton = document.getElementById('payBtn');
 
-        try {
-            if (typeof Razorpay === 'undefined') {
-                throw new Error("Razorpay SDK not loaded. Please refresh.");
-            }
+    if (payButton) {
+        payButton.addEventListener('click', async function (e) {
+            e.preventDefault();
 
-            // 1. Create Order
-            const orderRes = await fetch('/create_order', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ amount: CONFIG.amount })
-            });
+            const originalText = this.innerHTML;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Initializing...';
+            this.disabled = true;
 
-            if (!orderRes.ok) throw new Error("Could not create order");
-            const orderData = await orderRes.json();
-
-            // 2. Open Checkout
-            const options = {
-                key: CONFIG.razorpayKey,
-                amount: orderData.amount,
-                currency: "INR",
-                name: "KropKart",
-                description: "Purchase: " + CONFIG.productName,
-                order_id: orderData.id,
-                handler: async function (response) {
-                    try {
-                        const verifyRes = await fetch('/verify_payment', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                product_id: CONFIG.productId,
-                                amount: CONFIG.amount,
-                                razorpay_order_id: response.razorpay_order_id,
-                                razorpay_payment_id: response.razorpay_payment_id,
-                                razorpay_signature: response.razorpay_signature
-                            })
-                        });
-                        const result = await verifyRes.json();
-                        if (result.status === 'success') {
-                            alert("✅ Payment Successful!");
-                            window.location.href = "/dashboard";
-                        } else {
-                            throw new Error(result.message || "Verification failed");
-                        }
-                    } catch (err) {
-                        alert("Error: " + err.message);
-                        btn.innerHTML = originalText;
-                        btn.disabled = false;
-                    }
-                },
-                prefill: {
-                    name: CONFIG.userName,
-                    email: CONFIG.userEmail
-                },
-                theme: { color: "#22c55e" },
-                modal: {
-                    ondismiss: function () {
-                        btn.innerHTML = originalText;
-                        btn.disabled = false;
-                    }
+            try {
+                // Check if Razorpay is loaded
+                if (typeof Razorpay === 'undefined') {
+                    throw new Error("Razorpay payment system is still loading. Please wait 2 seconds and try again.");
                 }
-            };
 
-            const rzp = new Razorpay(options);
-            rzp.open();
+                console.log("Requesting order creation for:", CONFIG.amount);
 
-        } catch (err) {
-            alert("Error: " + err.message);
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-        }
-    };
+                // 1. Create Order on Server
+                const orderRes = await fetch('/create_order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount: CONFIG.amount })
+                });
+
+                const orderData = await orderRes.json();
+
+                if (!orderRes.ok) {
+                    throw new Error(orderData.error || "Server could not create the order. Check your internet.");
+                }
+
+                if (!orderData.id) {
+                    throw new Error("Invalid response from payment server.");
+                }
+
+                console.log("Order created successfully:", orderData.id);
+
+                // 2. Open Razorpay Checkout Modal
+                const options = {
+                    key: CONFIG.razorpayKey,
+                    amount: orderData.amount, // in paise
+                    currency: "INR",
+                    name: "KropKart Marketplace",
+                    description: "Payment for " + CONFIG.productName,
+                    order_id: orderData.id,
+                    handler: async function (response) {
+                        payButton.innerHTML = '<i class="fas fa-check-circle"></i> Verifying...';
+                        console.log("Payment received, verifying with server...");
+
+                        try {
+                            const verifyRes = await fetch('/verify_payment', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    product_id: CONFIG.productId,
+                                    amount: CONFIG.amount,
+                                    razorpay_order_id: response.razorpay_order_id,
+                                    razorpay_payment_id: response.razorpay_payment_id,
+                                    razorpay_signature: response.razorpay_signature
+                                })
+                            });
+
+                            const result = await verifyRes.json();
+
+                            if (result.status === 'success') {
+                                alert("✅ Payment Successful! Your order has been placed.");
+                                window.location.href = "/dashboard";
+                            } else {
+                                throw new Error(result.message || "Payment verification failed.");
+                            }
+                        } catch (err) {
+                            console.error("Verification Error:", err);
+                            alert("⚠️ Payment was successful but verification failed: " + err.message);
+                            payButton.innerHTML = originalText;
+                            payButton.disabled = false;
+                        }
+                    },
+                    prefill: {
+                        name: CONFIG.userName,
+                        email: CONFIG.userEmail
+                    },
+                    theme: { color: "#166534" },
+                    modal: {
+                        ondismiss: function () {
+                            console.log("Payment window closed by user.");
+                            payButton.innerHTML = originalText;
+                            payButton.disabled = false;
+                        }
+                    }
+                };
+
+                const rzp = new Razorpay(options);
+
+                rzp.on('payment.failed', function (response) {
+                    console.error("Payment Failed:", response.error);
+                    alert("❌ Payment Failed: " + response.error.description);
+                    payButton.innerHTML = originalText;
+                    payButton.disabled = false;
+                });
+
+                rzp.open();
+
+            } catch (err) {
+                console.error("Checkout Error:", err);
+                alert("Payment Error: " + err.message);
+                this.innerHTML = originalText;
+                this.disabled = false;
+            }
+        });
+    } else {
+        console.error("Pay button not found on page!");
+    }
 </script>
 {% endblock %}
