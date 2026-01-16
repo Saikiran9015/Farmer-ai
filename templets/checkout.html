@@ -61,15 +61,22 @@
     </div>
 </div>
 
+<!-- Hidden Configuration for JavaScript -->
+<div id="checkoutConfig" data-key="{{ RAZORPAY_KEY_ID }}" data-id="{{ product._id }}"
+    data-name="{{ product.name|replace('\"', ' &quot;') }}" data-amount="{{ product.adjusted_price }}"
+    data-email="{{ session.get('user', '') }}" data-user="{{ session.get('name', 'Customer')|replace('\"', ' &quot;')
+    }}">
+</div>
+
 <script>
-    // Configuration from Server - Fixed Jinja tags (no spaces between {{)
+    const configEl = document.getElementById('checkoutConfig');
     const CONFIG = {
-        razorpayKey: {{ RAZORPAY_KEY_ID| tojson }},
-    productId: { { product._id | tojson } },
-    productName: { { product.name | tojson } },
-    amount: parseFloat({{ product.adjusted_price | tojson }}),
-        userEmail: { { session.get('user', '') | tojson } },
-    userName: { { session.get('name', 'Customer') | tojson } }
+        razorpayKey: configEl.dataset.key,
+        productId: configEl.dataset.id,
+        productName: configEl.dataset.name,
+        amount: parseFloat(configEl.dataset.amount || 0),
+        userEmail: configEl.dataset.email,
+        userName: configEl.dataset.user
     };
 
     console.log("KropKart Payment Config Loaded:", CONFIG);
@@ -79,14 +86,15 @@
     if (payButton) {
         payButton.addEventListener('click', async function (e) {
             e.preventDefault();
+            const btn = this;
+            const originalText = btn.innerHTML;
 
-            const originalText = this.innerHTML;
-            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Initializing...';
-            this.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Initializing...';
+            btn.disabled = true;
 
             try {
                 if (typeof Razorpay === 'undefined') {
-                    throw new Error("Razorpay system not ready. Please refresh the page.");
+                    throw new Error("Razorpay system failed to load. Please check your internet connection.");
                 }
 
                 // 1. Create Order
@@ -96,13 +104,13 @@
                     body: JSON.stringify({ amount: CONFIG.amount })
                 });
 
+                if (!orderRes.ok) {
+                    const errorJson = await orderRes.json();
+                    throw new Error(errorJson.error || "Order creation failed");
+                }
                 const orderData = await orderRes.json();
 
-                if (!orderRes.ok) {
-                    throw new Error(orderData.error || "Order creation failed");
-                }
-
-                // 2. Open Razorpay
+                // 2. Open Razorpay Modal
                 const options = {
                     key: CONFIG.razorpayKey,
                     amount: orderData.amount,
@@ -111,7 +119,7 @@
                     description: "Payment for " + CONFIG.productName,
                     order_id: orderData.id,
                     handler: async function (response) {
-                        payButton.innerHTML = '<i class="fas fa-check-circle"></i> Verifying...';
+                        btn.innerHTML = '<i class="fas fa-check-circle"></i> Verifying...';
                         try {
                             const verifyRes = await fetch('/verify_payment', {
                                 method: 'POST',
@@ -129,12 +137,12 @@
                                 alert("✅ Payment Successful!");
                                 window.location.href = "/dashboard";
                             } else {
-                                throw new Error(result.message || "Verification failed");
+                                throw new Error(result.message || "Payment verification failed");
                             }
                         } catch (err) {
                             alert("Verification error: " + err.message);
-                            payButton.innerHTML = originalText;
-                            payButton.disabled = false;
+                            btn.innerHTML = originalText;
+                            btn.disabled = false;
                         }
                     },
                     prefill: {
@@ -144,8 +152,8 @@
                     theme: { color: "#166534" },
                     modal: {
                         ondismiss: function () {
-                            payButton.innerHTML = originalText;
-                            payButton.disabled = false;
+                            btn.innerHTML = originalText;
+                            btn.disabled = false;
                         }
                     }
                 };
@@ -154,9 +162,10 @@
                 rzp.open();
 
             } catch (err) {
+                console.error("Payment Error:", err);
                 alert("Error: " + err.message);
-                this.innerHTML = originalText;
-                this.disabled = false;
+                btn.innerHTML = originalText;
+                btn.disabled = false;
             }
         });
     }

@@ -307,20 +307,42 @@ def checkout(product_id):
     if "user" not in session: return redirect("/login")
     try:
         db_local = ensure_db_connection()
-        # Handle cases where product_id might be wrapped in ObjectId() string
-        clean_id = product_id.replace("ObjectId('", "").replace("')", "").strip()
-        product = db_local.products.find_one({"_id": ObjectId(clean_id)})
+        if db_local is None:
+            flash("Database connection lost. Please refresh.", "error")
+            return redirect("/dashboard")
+
+        # Robust ID cleaning
+        raw_id = str(product_id).strip()
+        if "ObjectId('" in raw_id:
+            raw_id = raw_id.replace("ObjectId('", "").replace("')", "")
+        
+        print(f"DEBUG: Checkout requested for Product ID: {raw_id}")
+        
+        try:
+            obj_id = ObjectId(raw_id)
+        except Exception:
+            print(f"ERROR: Invalid ObjectId format: {raw_id}")
+            flash("Invalid link format. Please go back to Marketplace.", "error")
+            return redirect("/citizen")
+
+        product = db_local.products.find_one({"_id": obj_id})
         
         if not product:
-            flash("Product not found!", "error")
-            return redirect("/dashboard")
+            print(f"ERROR: Product not found for ID: {raw_id}")
+            flash("This product is no longer available.", "error")
+            return redirect("/citizen")
         
-        # Convert _id to string for template
+        # Ensure all required fields exist for template
         product['_id'] = str(product['_id'])
+        if 'adjusted_price' not in product:
+            product['adjusted_price'] = product.get('price', 0)
+            
         return render_template("checkout.html", product=product)
+        
     except Exception as e:
-        print(f"Checkout error: {e}")
-        flash("Invalid product link.", "error")
+        print(f"CRITICAL Checkout error: {str(e)}")
+        traceback.print_exc()
+        flash("System error loading checkout. Please try again.", "error")
         return redirect("/dashboard")
 
 # PAYMENT INTEGRATION
