@@ -26,8 +26,9 @@ app.secret_key = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production")
 
 # Razorpay Setup
 # Razorpay Setup
-RAZORPAY_KEY_ID = os.getenv("RAZORPAY_KEY_ID", "rzp_live_S48A3olQrEUfFd")
-RAZORPAY_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET", "zx7XbZA6S3QGw9N26hRWh2BK")
+# Razorpay Setup
+RAZORPAY_KEY_ID = os.getenv("RAZORPAY_KEY_ID") or os.getenv("key_id") or "rzp_live_S48A3olQrEUfFd"
+RAZORPAY_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET") or os.getenv("key_secret") or "zx7XbZA6S3QGw9N26hRWh2BK"
 razorpay_client = razorpay.Client(auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET))
 
 # MongoDB connection
@@ -205,18 +206,31 @@ def add_product():
         category = request.form.get("category", "General")
         desc = request.form.get("description", "")
         
+        print(f"DEBUG: Received product upload for '{name}' with price {price_str}")
+
+        # Validate name
+        if not name:
+            flash("Product name is required.", "error")
+            return redirect("/add-listing")
+
         # Validate price
         try:
             price = float(price_str)
         except (ValueError, TypeError):
-            flash("Invalid price provided.", "error")
+            flash("Invalid price provided. Please enter a numeric value.", "error")
             return redirect("/add-listing")
 
         # Handle image upload
         file = request.files.get("image")
         image_url = ""
         if file and file.filename:
-            fname = secure_filename(file.filename)
+            original_fname = secure_filename(file.filename)
+            # Fallback if secure_filename returns empty (e.g. for non-ASCII)
+            if not original_fname:
+                original_fname = f"product_{int(datetime.now().timestamp())}_{random.randint(100, 999)}.png"
+            
+            fname = f"{int(datetime.now().timestamp())}_{original_fname}"
+            
             # Ensure image directory exists
             image_dir = os.path.join(os.path.dirname(__file__), 'statics', 'image')
             os.makedirs(image_dir, exist_ok=True)
@@ -224,7 +238,7 @@ def add_product():
             path = os.path.join(image_dir, fname)
             file.save(path)
             image_url = f"/statics/image/{fname}"
-            print(f"Image saved to: {path}")
+            print(f"Image saved successfully to: {path}")
 
         quality = analyze_quality(name, desc, category, price)
         adj_price = compute_adjusted_price(price, quality)
@@ -245,9 +259,9 @@ def add_product():
         return redirect("/dashboard")
         
     except Exception as e:
-        print(f"Error in add_product: {str(e)}")
+        print(f"CRITICAL Error in add_product: {str(e)}")
         traceback.print_exc()
-        flash(f"An error occurred while uploading. Please check all fields.", "error")
+        flash(f"Upload Error: {str(e)}", "error")
         return redirect("/add-listing")
 
 # Context Processor

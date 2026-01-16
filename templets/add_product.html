@@ -139,15 +139,38 @@
 
             <div class="form-group">
                 <label class="form-label">Product Image</label>
-                <div style="border: 2px dashed var(--gray-300); padding: 2rem; text-align: center; border-radius: var(--radius); background: var(--gray-50); transition: all 0.2s;"
+                <div id="image-preview-container" style="display: none; margin-bottom: 1rem; text-align: center;">
+                    <img id="image-preview" src="#" alt="Preview"
+                        style="max-width: 100%; max-height: 300px; border-radius: var(--radius); box-shadow: var(--shadow-md); border: 3px solid var(--primary-light);">
+                </div>
+                <div style="border: 2px dashed var(--gray-300); padding: 2rem; text-align: center; border-radius: var(--radius); background: var(--gray-50); transition: all 0.2s; position: relative;"
                     onmouseover="this.style.background='#f0fdf4'; this.style.borderColor='var(--primary)'"
                     onmouseout="this.style.background='var(--gray-50)'; this.style.borderColor='var(--gray-300)'">
                     <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
                     <p class="text-muted" style="margin-bottom: 1rem;">Click to upload clear photo</p>
-                    <input type="file" name="image" class="form-control"
-                        style="border: none; background: transparent; padding: 0;">
+                    <input type="file" name="image" id="product-image-input" class="form-control"
+                        style="border: none; background: transparent; padding: 0;" accept="image/*"
+                        onchange="previewImage(this)">
                 </div>
             </div>
+
+            <script>
+                function previewImage(input) {
+                    const preview = document.getElementById('image-preview');
+                    const container = document.getElementById('image-preview-container');
+                    if (input.files && input.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            preview.src = e.target.result;
+                            container.style.display = 'block';
+                        }
+                        reader.readAsDataURL(input.files[0]);
+                    } else {
+                        preview.src = '#';
+                        container.style.display = 'none';
+                    }
+                }
+            </script>
 
             <div style="padding-top: 1rem; border-top: 1px solid var(--gray-100);">
                 <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.1rem; padding: 1rem;">
