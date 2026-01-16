@@ -187,41 +187,68 @@ def add_listing_page():
 
 @app.route("/add_product", methods=["POST"])
 def add_product():
-    if "user" not in session: return redirect("/login")
+    if "user" not in session: 
+        return redirect("/login")
+    
     if session.get("user_type") not in ["farmer", "business", "admin"]:
         flash("Only farmers and businesses can list products!", "error")
         return redirect("/dashboard")
     
-    name = request.form.get("name")
-    price = request.form.get("price")
-    category = request.form.get("category")
-    desc = request.form.get("description")
-    
-    # Handle image upload
-    file = request.files.get("image")
-    image_url = ""
-    if file and file.filename:
-        fname = secure_filename(file.filename)
-        # Ensure image directory exists
-        image_dir = os.path.join(os.path.dirname(__file__), 'statics', 'image')
-        os.makedirs(image_dir, exist_ok=True)
+    try:
+        db_local = ensure_db_connection()
+        if db_local is None:
+            flash("Database connection error. Please try again later.", "error")
+            return redirect("/dashboard")
+
+        name = request.form.get("name")
+        price_str = request.form.get("price", "0")
+        category = request.form.get("category", "General")
+        desc = request.form.get("description", "")
         
-        path = os.path.join(image_dir, fname)
-        file.save(path)
-        image_url = f"/statics/image/{fname}"
-        print(f"Image saved to: {path}")
+        # Validate price
+        try:
+            price = float(price_str)
+        except (ValueError, TypeError):
+            flash("Invalid price provided.", "error")
+            return redirect("/add-listing")
 
-    quality = analyze_quality(name, desc, category, price)
-    adj_price = compute_adjusted_price(price, quality)
+        # Handle image upload
+        file = request.files.get("image")
+        image_url = ""
+        if file and file.filename:
+            fname = secure_filename(file.filename)
+            # Ensure image directory exists
+            image_dir = os.path.join(os.path.dirname(__file__), 'statics', 'image')
+            os.makedirs(image_dir, exist_ok=True)
+            
+            path = os.path.join(image_dir, fname)
+            file.save(path)
+            image_url = f"/statics/image/{fname}"
+            print(f"Image saved to: {path}")
 
-    ensure_db_connection().products.insert_one({
-        "name": name, "price": float(price), "adjusted_price": adj_price,
-        "category": category, "description": desc, "image": image_url,
-        "owner": session.get("user"), "owner_type": session.get("user_type"),
-        "quality_score": quality, "created_at": datetime.now()
-    })
-    flash("Product listed with AI Quality Score!", "success")
-    return redirect("/dashboard")
+        quality = analyze_quality(name, desc, category, price)
+        adj_price = compute_adjusted_price(price, quality)
+
+        db_local.products.insert_one({
+            "name": name, 
+            "price": price, 
+            "adjusted_price": adj_price,
+            "category": category, 
+            "description": desc, 
+            "image": image_url,
+            "owner": session.get("user"), 
+            "owner_type": session.get("user_type"),
+            "quality_score": quality, 
+            "created_at": datetime.now()
+        })
+        flash("Product listed successfully with AI Quality Score!", "success")
+        return redirect("/dashboard")
+        
+    except Exception as e:
+        print(f"Error in add_product: {str(e)}")
+        traceback.print_exc()
+        flash(f"An error occurred while uploading. Please check all fields.", "error")
+        return redirect("/add-listing")
 
 # Context Processor
 @app.context_processor
