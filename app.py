@@ -97,8 +97,9 @@ def index():
     products = list(db_local.products.find().sort("created_at", -1))
     for p in products:
         q = p.get('quality_score', 0.8)
-        # Map 0.5-1.0 to 3.5-5.0
-        p['rating'] = round(3.5 + (max(0, q-0.5) / 0.5) * 1.5, 1)
+        # Map 0.5-1.0 to 3.5-5.0 + 10% random boost
+        base_rating = 3.5 + (max(0, q-0.5) / 0.5) * 1.5
+        p['rating'] = round(min(5.0, base_rating * (1 + random.uniform(0.05, 0.10))), 1)
     return render_template("index.html", products=products)
 
 @app.route("/register", methods=["GET", "POST"])
@@ -152,7 +153,8 @@ def landing():
     products = list(db_local.products.find({"owner": session.get("user")}))
     for p in products:
         q = p.get('quality_score', 0.8)
-        p['rating'] = round(3.5 + (max(0, q-0.5) / 0.5) * 1.5, 1)
+        base_rating = 3.5 + (max(0, q-0.5) / 0.5) * 1.5
+        p['rating'] = round(min(5.0, base_rating * (1 + random.uniform(0.05, 0.10))), 1)
     return render_template("landing.html", products=products)
 
 @app.route("/landingb") # Business Landing/Control Panel
@@ -161,7 +163,8 @@ def landingb():
     products = list(db_local.products.find())
     for p in products:
         q = p.get('quality_score', 0.8)
-        p['rating'] = round(3.5 + (max(0, q-0.5) / 0.5) * 1.5, 1)
+        base_rating = 3.5 + (max(0, q-0.5) / 0.5) * 1.5
+        p['rating'] = round(min(5.0, base_rating * (1 + random.uniform(0.05, 0.10))), 1)
     return render_template("landingb.html", products=products)
 
 @app.route("/citizen") # Citizen Landing
@@ -170,7 +173,8 @@ def citizen():
     products = list(db_local.products.find().sort("created_at", -1))
     for p in products:
         q = p.get('quality_score', 0.8)
-        p['rating'] = round(3.5 + (max(0, q-0.5) / 0.5) * 1.5, 1)
+        base_rating = 3.5 + (max(0, q-0.5) / 0.5) * 1.5
+        p['rating'] = round(min(5.0, base_rating * (1 + random.uniform(0.05, 0.10))), 1)
     return render_template("index.html", products=products)
 
 @app.route("/add-listing")
