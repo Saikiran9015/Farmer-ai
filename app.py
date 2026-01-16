@@ -393,6 +393,24 @@ def logout():
     flash("Successfully logged out!", "success")
     return redirect("/")
 
+@app.route("/delete_product/<product_id>")
+def delete_product(product_id):
+    if "user" not in session: return redirect("/login")
+    db_local = ensure_db_connection()
+    product = db_local.products.find_one({"_id": ObjectId(product_id)})
+    if not product:
+        flash("Product not found!", "error")
+        return redirect("/")
+    
+    # Check if user is admin or owner
+    if session.get("user_type") == "admin" or product.get("owner") == session.get("user"):
+        db_local.products.delete_one({"_id": ObjectId(product_id)})
+        flash("Product deleted successfully!", "success")
+    else:
+        flash("Unauthorized to delete this product!", "error")
+        
+    return redirect(request.referrer or "/")
+
 if __name__ == "__main__":
     init_db()
     app.run(debug=True, port=int(os.getenv("PORT", 5000)))

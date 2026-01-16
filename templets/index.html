@@ -69,8 +69,8 @@
                 {% if session.get('user_type') == 'admin' or product.owner == session.get('user') %}
                 <div style="position: absolute; top: 1rem; left: 1rem; z-index: 10;">
                     <a href="/delete_product/{{ product._id }}" class="btn"
-                        onclick="return confirm('Arre you sure you want to delete this product?')"
-                        style="background: rgba(220, 38, 38, 0.9); color: white; padding: 0.45rem 0.9rem; font-size: 0.75rem; border-radius: 0.75rem; font-weight: 700; border: none; cursor: pointer; backdrop-filter: blur(8px);">
+                        onclick="return confirm('Are you sure you want to delete this product?')"
+                        style="background: rgba(220, 38, 38, 0.9); color: white; padding: 0.5rem 0.8rem; font-size: 0.8rem; border-radius: 0.75rem; font-weight: 700; border: none; cursor: pointer; backdrop-filter: blur(8px); display: flex; align-items: center; gap: 0.4rem;">
                         <i class="fas fa-trash-alt"></i> Delete
                     </a>
                 </div>
