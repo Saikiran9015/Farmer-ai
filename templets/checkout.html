@@ -61,6 +61,16 @@
 </div>
 
 <script>
+    // Configuration from Server
+    const CONFIG = {
+        razorpayKey: "{{ RAZORPAY_KEY_ID }}",
+        productId: "{{ product._id }}",
+        productName: "{{ product.name|replace('\'', '') }}",
+        amount: parseFloat("{{ product.adjusted_price or 0 }}"),
+        userEmail: "{{ session.get('user', '') }}",
+        userName: "{{ session.get('name', 'Customer') }}"
+    };
+
     document.getElementById('payBtn').onclick = async function (e) {
         e.preventDefault();
         const btn = this;
@@ -70,96 +80,75 @@
         btn.disabled = true;
 
         try {
-            // Check if Razorpay SDK is loaded
             if (typeof Razorpay === 'undefined') {
-                throw new Error("Razorpay SDK not loaded. Please refresh the page.");
+                throw new Error("Razorpay SDK not loaded. Please refresh.");
             }
 
-            console.log("Creating order for amount:", {{ product.adjusted_price or 0 }});
-
-        // Step 1: Create Order on Server
-        const orderRes = await fetch('/create_order', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                amount: {{ product.adjusted_price or 0 }}
-                })
+            // 1. Create Order
+            const orderRes = await fetch('/create_order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount: CONFIG.amount })
             });
 
-    if (!orderRes.ok) {
-        const errorText = await orderRes.text();
-        throw new Error("Server error: " + orderRes.status);
-    }
+            if (!orderRes.ok) throw new Error("Could not create order");
+            const orderData = await orderRes.json();
 
-    const orderData = await orderRes.json();
-
-    if (!orderData.id) {
-        throw new Error("Invalid order response");
-    }
-
-    // Step 2: Initialize Razorpay
-    const options = {
-        key: "{{ RAZORPAY_KEY_ID }}",
-        amount: orderData.amount,
-        currency: "INR",
-        name: "KropKart Market",
-        description: "Order for {{ product.name|replace('\'', '') }}",
-        order_id: orderData.id,
-        handler: async function (response) {
-            try {
-                const res = await fetch('/verify_payment', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        product_id: "{{ product._id }}",
-                        amount: {{ product.adjusted_price or 0 }},
-                    razorpay_payment_id: response.razorpay_payment_id,
-                    razorpay_order_id: response.razorpay_order_id,
-                    razorpay_signature: response.razorpay_signature
+            // 2. Open Checkout
+            const options = {
+                key: CONFIG.razorpayKey,
+                amount: orderData.amount,
+                currency: "INR",
+                name: "KropKart",
+                description: "Purchase: " + CONFIG.productName,
+                order_id: orderData.id,
+                handler: async function (response) {
+                    try {
+                        const verifyRes = await fetch('/verify_payment', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                product_id: CONFIG.productId,
+                                amount: CONFIG.amount,
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_signature: response.razorpay_signature
                             })
-        });
-    const data = await res.json();
-    if (data.status === 'success') {
-        alert("✅ Payment Successful!");
-        window.location.href = "/dashboard";
-    } else {
-        alert("❌ Payment verification failed.");
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-    }
+                        });
+                        const result = await verifyRes.json();
+                        if (result.status === 'success') {
+                            alert("✅ Payment Successful!");
+                            window.location.href = "/dashboard";
+                        } else {
+                            throw new Error(result.message || "Verification failed");
+                        }
                     } catch (err) {
-        alert("Verification failed: " + err.message);
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-    }
+                        alert("Error: " + err.message);
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    }
                 },
-    prefill: {
-        name: "{{ session.get('name', 'Customer') }}",
-            email: "{{ session.get('user', '') }}"
-    },
-    theme: { color: "#22c55e" },
-    modal: {
-        ondismiss: function() {
+                prefill: {
+                    name: CONFIG.userName,
+                    email: CONFIG.userEmail
+                },
+                theme: { color: "#22c55e" },
+                modal: {
+                    ondismiss: function () {
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    }
+                }
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.open();
+
+        } catch (err) {
+            alert("Error: " + err.message);
             btn.innerHTML = originalText;
             btn.disabled = false;
         }
-    }
-            };
-
-    const rzp = new Razorpay(options);
-    rzp.on('payment.failed', function (response) {
-        alert("❌ Payment Failed: " + response.error.description);
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-    });
-    rzp.open();
-            
-        } catch (err) {
-        console.error("Payment error:", err);
-        alert("Error: " + err.message);
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-    }
-    }
+    };
 </script>
 {% endblock %}

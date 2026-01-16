@@ -43,7 +43,7 @@
             </div>
 
             <p class="text-muted"
-                style="font-size: 0.9rem; line-height: 1.5; height: 3em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                style="font-size: 0.9rem; line-height: 1.5; height: 3em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical;">
                 {{ product.description }}
             </p>
 
@@ -151,36 +151,4 @@
     </div>
 </div>
 
-<script>
-    function payNow(id, price, name) {
-        const options = {
-            key: "{{ RAZORPAY_KEY_ID }}",
-            amount: price * 100,
-            currency: "INR",
-            name: "KropKart Industrial",
-            description: "Bulk Purchase: " + name,
-            handler: async function (response) {
-                const res = await fetch('/verify_payment', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        product_id: id,
-                        amount: price,
-                        razorpay_payment_id: response.razorpay_payment_id,
-                        razorpay_order_id: response.razorpay_order_id,
-                        razorpay_signature: response.razorpay_signature
-                    })
-                });
-                const data = await res.json();
-                if (data.status === 'success') {
-                    alert("Procurement Order Confirmed!");
-                    window.location.reload();
-                }
-            },
-            theme: { color: "#0f172a" }
-        };
-        const rzp = new Razorpay(options);
-        rzp.open();
-    }
-</script>
 {% endblock %}

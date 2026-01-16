@@ -337,7 +337,12 @@ def verify_payment():
             return jsonify({"status": "failed", "message": "No data received"}), 400
         
         # Verify payment signature
-        razorpay_client.utility.verify_payment_signature(data)
+        params_dict = {
+            'razorpay_order_id': data.get('razorpay_order_id'),
+            'razorpay_payment_id': data.get('razorpay_payment_id'),
+            'razorpay_signature': data.get('razorpay_signature')
+        }
+        razorpay_client.utility.verify_payment_signature(params_dict)
         
         # Record order in DB
         ensure_db_connection().orders.insert_one({
