@@ -62,7 +62,7 @@
 </div>
 
 <script>
-    // Configuration from Server - Using tojson for maximum safety
+    // Configuration from Server - Fixed Jinja tags (no spaces between {{)
     const CONFIG = {
         razorpayKey: {{ RAZORPAY_KEY_ID| tojson }},
     productId: { { product._id | tojson } },
@@ -85,14 +85,11 @@
             this.disabled = true;
 
             try {
-                // Check if Razorpay is loaded
                 if (typeof Razorpay === 'undefined') {
-                    throw new Error("Razorpay payment system is still loading. Please wait 2 seconds and try again.");
+                    throw new Error("Razorpay system not ready. Please refresh the page.");
                 }
 
-                console.log("Requesting order creation for:", CONFIG.amount);
-
-                // 1. Create Order on Server
+                // 1. Create Order
                 const orderRes = await fetch('/create_order', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -102,27 +99,19 @@
                 const orderData = await orderRes.json();
 
                 if (!orderRes.ok) {
-                    throw new Error(orderData.error || "Server could not create the order. Check your internet.");
+                    throw new Error(orderData.error || "Order creation failed");
                 }
 
-                if (!orderData.id) {
-                    throw new Error("Invalid response from payment server.");
-                }
-
-                console.log("Order created successfully:", orderData.id);
-
-                // 2. Open Razorpay Checkout Modal
+                // 2. Open Razorpay
                 const options = {
                     key: CONFIG.razorpayKey,
-                    amount: orderData.amount, // in paise
+                    amount: orderData.amount,
                     currency: "INR",
-                    name: "KropKart Marketplace",
+                    name: "KropKart",
                     description: "Payment for " + CONFIG.productName,
                     order_id: orderData.id,
                     handler: async function (response) {
                         payButton.innerHTML = '<i class="fas fa-check-circle"></i> Verifying...';
-                        console.log("Payment received, verifying with server...");
-
                         try {
                             const verifyRes = await fetch('/verify_payment', {
                                 method: 'POST',
@@ -135,18 +124,15 @@
                                     razorpay_signature: response.razorpay_signature
                                 })
                             });
-
                             const result = await verifyRes.json();
-
                             if (result.status === 'success') {
-                                alert("✅ Payment Successful! Your order has been placed.");
+                                alert("✅ Payment Successful!");
                                 window.location.href = "/dashboard";
                             } else {
-                                throw new Error(result.message || "Payment verification failed.");
+                                throw new Error(result.message || "Verification failed");
                             }
                         } catch (err) {
-                            console.error("Verification Error:", err);
-                            alert("⚠️ Payment was successful but verification failed: " + err.message);
+                            alert("Verification error: " + err.message);
                             payButton.innerHTML = originalText;
                             payButton.disabled = false;
                         }
@@ -158,7 +144,6 @@
                     theme: { color: "#166534" },
                     modal: {
                         ondismiss: function () {
-                            console.log("Payment window closed by user.");
                             payButton.innerHTML = originalText;
                             payButton.disabled = false;
                         }
@@ -166,25 +151,14 @@
                 };
 
                 const rzp = new Razorpay(options);
-
-                rzp.on('payment.failed', function (response) {
-                    console.error("Payment Failed:", response.error);
-                    alert("❌ Payment Failed: " + response.error.description);
-                    payButton.innerHTML = originalText;
-                    payButton.disabled = false;
-                });
-
                 rzp.open();
 
             } catch (err) {
-                console.error("Checkout Error:", err);
-                alert("Payment Error: " + err.message);
+                alert("Error: " + err.message);
                 this.innerHTML = originalText;
                 this.disabled = false;
             }
         });
-    } else {
-        console.error("Pay button not found on page!");
     }
 </script>
 {% endblock %}

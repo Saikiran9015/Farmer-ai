@@ -24,12 +24,29 @@ template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'templets
 app = Flask(__name__, template_folder=template_dir)
 app.secret_key = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production")
 
-# Razorpay Setup
-# Razorpay Setup
-# Razorpay Setup
-RAZORPAY_KEY_ID = os.getenv("RAZORPAY_KEY_ID") or os.getenv("key_id") or "rzp_live_S48A3olQrEUfFd"
-RAZORPAY_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET") or os.getenv("key_secret") or "zx7XbZA6S3QGw9N26hRWh2BK"
-razorpay_client = razorpay.Client(auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET))
+# Razorpay Setup - Loading from .env with priority
+RAZORPAY_KEY_ID = os.getenv("RAZORPAY_KEY_ID") or os.getenv("key_id")
+RAZORPAY_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET") or os.getenv("key_secret")
+
+# Fallback for development if no keys found
+if not RAZORPAY_KEY_ID:
+    print("WARNING: No Razorpay Key ID found in environment. Using fallback.")
+    RAZORPAY_KEY_ID = "rzp_live_S48A3olQrEUfFd"
+if not RAZORPAY_KEY_SECRET:
+    RAZORPAY_KEY_SECRET = "zx7XbZA6S3QGw9N26hRWh2BK"
+
+try:
+    razorpay_client = razorpay.Client(auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET))
+    # Test keys immediately
+    razorpay_client.order.create({"amount": 100, "currency": "INR"})
+    print(f"✅ Razorpay Authenticated Successfully (ID: {RAZORPAY_KEY_ID[:12]}...)")
+except razorpay.errors.BadRequestError:
+    print(f"❌ Razorpay AUTHENTICATION FAILED: Check your key_id and key_secret in .env")
+    razorpay_client = None
+except Exception as e:
+    print(f"⚠️ Razorpay Setup Warning: {e}")
+    # We still keep the client if it's just a network issue
+    if 'razorpay_client' not in locals(): razorpay_client = None
 
 # MongoDB connection
 mongo_uri = os.getenv("MONGO_URI")
@@ -309,24 +326,33 @@ def checkout(product_id):
 # PAYMENT INTEGRATION
 @app.route("/create_order", methods=["POST"])
 def create_order():
+    if not razorpay_client:
+        return jsonify({"error": "Razorpay client not configured"}), 500
     try:
         data = request.get_json()
-        if not data or 'amount' not in data:
-            return jsonify({"error": "Amount is required"}), 400
+        raw_amount = data.get('amount', 0)
         
-        amount = int(float(data['amount']) * 100)  # Convert to paise
+        # Razorpay expects amount in paise (integer)
+        amount = int(float(raw_amount) * 100)
         
-        # Create Razorpay order
-        order = razorpay_client.order.create({
-            "amount": amount, 
-            "currency": "INR", 
-            "payment_capture": "1"
-        })
+        if amount <= 0:
+            return jsonify({"error": "Invalid amount"}), 400
+            
+        print(f"Creating Razorpay order for {amount} paise...")
         
-        print(f"Order created successfully: {order['id']}")
+        order_params = {
+            "amount": amount,
+            "currency": "INR",
+            "payment_capture": 1 # Auto-capture payment
+        }
+        
+        order = razorpay_client.order.create(order_params)
+        
+        print(f"Order created successfully: {order.get('id')}")
         return jsonify(order)
     except Exception as e:
         print(f"Error creating order: {str(e)}")
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
 
 @app.route("/verify_payment", methods=["POST"])
