@@ -97,6 +97,7 @@ def index():
     db_local = ensure_db_connection()
     products = list(db_local.products.find().sort("created_at", -1))
     for p in products:
+        p['_id'] = str(p['_id'])
         q = p.get('quality_score', 0.8)
         # Map 0.5-1.0 to 3.5-5.0 + 10% random boost
         base_rating = 3.5 + (max(0, q-0.5) / 0.5) * 1.5
@@ -153,6 +154,7 @@ def landing():
     db_local = ensure_db_connection()
     products = list(db_local.products.find({"owner": session.get("user")}))
     for p in products:
+        p['_id'] = str(p['_id'])
         q = p.get('quality_score', 0.8)
         base_rating = 3.5 + (max(0, q-0.5) / 0.5) * 1.5
         p['rating'] = round(min(5.0, base_rating * (1 + random.uniform(0.05, 0.10))), 1)
@@ -163,6 +165,7 @@ def landingb():
     db_local = ensure_db_connection()
     products = list(db_local.products.find())
     for p in products:
+        p['_id'] = str(p['_id'])
         q = p.get('quality_score', 0.8)
         base_rating = 3.5 + (max(0, q-0.5) / 0.5) * 1.5
         p['rating'] = round(min(5.0, base_rating * (1 + random.uniform(0.05, 0.10))), 1)
@@ -173,6 +176,7 @@ def citizen():
     db_local = ensure_db_connection()
     products = list(db_local.products.find().sort("created_at", -1))
     for p in products:
+        p['_id'] = str(p['_id'])
         q = p.get('quality_score', 0.8)
         base_rating = 3.5 + (max(0, q-0.5) / 0.5) * 1.5
         p['rating'] = round(min(5.0, base_rating * (1 + random.uniform(0.05, 0.10))), 1)
@@ -284,12 +288,23 @@ def inject_razorpay_key():
 @app.route("/checkout/<product_id>")
 def checkout(product_id):
     if "user" not in session: return redirect("/login")
-    db_local = ensure_db_connection()
-    product = db_local.products.find_one({"_id": ObjectId(product_id)})
-    if not product:
-        flash("Product not found!", "error")
+    try:
+        db_local = ensure_db_connection()
+        # Handle cases where product_id might be wrapped in ObjectId() string
+        clean_id = product_id.replace("ObjectId('", "").replace("')", "").strip()
+        product = db_local.products.find_one({"_id": ObjectId(clean_id)})
+        
+        if not product:
+            flash("Product not found!", "error")
+            return redirect("/dashboard")
+        
+        # Convert _id to string for template
+        product['_id'] = str(product['_id'])
+        return render_template("checkout.html", product=product)
+    except Exception as e:
+        print(f"Checkout error: {e}")
+        flash("Invalid product link.", "error")
         return redirect("/dashboard")
-    return render_template("checkout.html", product=product)
 
 # PAYMENT INTEGRATION
 @app.route("/create_order", methods=["POST"])
@@ -453,18 +468,24 @@ def logout():
 @app.route("/delete_product/<product_id>")
 def delete_product(product_id):
     if "user" not in session: return redirect("/login")
-    db_local = ensure_db_connection()
-    product = db_local.products.find_one({"_id": ObjectId(product_id)})
-    if not product:
-        flash("Product not found!", "error")
-        return redirect("/")
-    
-    # Check if user is admin or owner
-    if session.get("user_type") == "admin" or product.get("owner") == session.get("user"):
-        db_local.products.delete_one({"_id": ObjectId(product_id)})
-        flash("Product deleted successfully!", "success")
-    else:
-        flash("Unauthorized to delete this product!", "error")
+    try:
+        db_local = ensure_db_connection()
+        clean_id = product_id.replace("ObjectId('", "").replace("')", "").strip()
+        product = db_local.products.find_one({"_id": ObjectId(clean_id)})
+        
+        if not product:
+            flash("Product not found!", "error")
+            return redirect("/")
+        
+        # Check if user is admin or owner
+        if session.get("user_type") == "admin" or product.get("owner") == session.get("user"):
+            db_local.products.delete_one({"_id": ObjectId(clean_id)})
+            flash("Product deleted successfully!", "success")
+        else:
+            flash("Unauthorized to delete this product!", "error")
+    except Exception as e:
+        print(f"Delete Error: {e}")
+        flash("Invalid product reference.", "error")
         
     return redirect(request.referrer or "/")
 
