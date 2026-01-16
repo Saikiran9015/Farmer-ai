@@ -224,21 +224,33 @@ def add_product():
         file = request.files.get("image")
         image_url = ""
         if file and file.filename:
-            original_fname = secure_filename(file.filename)
-            # Fallback if secure_filename returns empty (e.g. for non-ASCII)
-            if not original_fname:
-                original_fname = f"product_{int(datetime.now().timestamp())}_{random.randint(100, 999)}.png"
-            
-            fname = f"{int(datetime.now().timestamp())}_{original_fname}"
-            
-            # Ensure image directory exists
-            image_dir = os.path.join(os.path.dirname(__file__), 'statics', 'image')
-            os.makedirs(image_dir, exist_ok=True)
-            
-            path = os.path.join(image_dir, fname)
-            file.save(path)
-            image_url = f"/statics/image/{fname}"
-            print(f"Image saved successfully to: {path}")
+            try:
+                original_fname = secure_filename(file.filename)
+                if not original_fname:
+                    original_fname = f"product_{int(datetime.now().timestamp())}.png"
+                
+                fname = f"{int(datetime.now().timestamp())}_{original_fname}"
+                image_dir = os.path.join(os.path.dirname(__file__), 'statics', 'image')
+                
+                # Try local saving first (works on local dev)
+                try:
+                    os.makedirs(image_dir, exist_ok=True)
+                    path = os.path.join(image_dir, fname)
+                    file.save(path)
+                    image_url = f"/statics/image/{fname}"
+                except (OSError, IOError) as e:
+                    # If read-only (Vercel), convert to Base64
+                    import base64
+                    file.seek(0)
+                    file_data = file.read()
+                    base64_data = base64.b64encode(file_data).decode('utf-8')
+                    mime_type = file.content_type or 'image/jpeg'
+                    image_url = f"data:{mime_type};base64,{base64_data}"
+                    print("Environment is Read-Only. Stored image as Base64 in Database.")
+            except Exception as img_err:
+                print(f"Image processing error: {img_err}")
+                # Continue without image if it fails
+                image_url = ""
 
         quality = analyze_quality(name, desc, category, price)
         adj_price = compute_adjusted_price(price, quality)
